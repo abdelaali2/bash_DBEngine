@@ -8,3 +8,7 @@ mkdir: cannot create directory ‘./dbms/omar’: File exists
 ./dbms.sh: line 50: cd: ./dbms/ahmed: No such file or directory
 ./dbms.sh: line 50: cd: ./dbms/ahmed: No such file or directory
 ./dbms.sh: line 50: cd: ./dbms/ahme: No such file or directory
+mkdir: cannot create directory ‘./dbms/omar’: File exists
+mkdir: cannot create directory ‘./dbms/omar’: File exists
+mv: './dbms/omar' and './dbms/omar' are the same file
+mv: './dbms/omar' and './dbms/omar' are the same file
