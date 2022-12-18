@@ -1,5 +1,8 @@
 #!/bin/bash
 
+shopt -s extglob
+export LC_COLLATE=C
+
 mkdir dbms
 
 clear
@@ -37,6 +40,8 @@ done
 
 function CreateDB(){
 	read -p "Please Enter database name: " dbName
+	case $dbName in
+	+([a-zA-Z]*))
 	mkdir ./dbms/"${dbName}" 2>> error.text
 	if [ $? -eq 0 ]
 	then
@@ -44,15 +49,24 @@ function CreateDB(){
 	else
 	echo -e "The database is already exist\n" 
 	fi
+	;;
+	*)
+	clear
+	echo -e "Invalid Naming Conventions database name should not start with a number or a specail character\n"
+	;;
+	esac
+	mainMenu
 }
 
 function connectToDB(){
+	pwd=$PWD
 	read -p "Please Enter database name: " dbName
 	cd ./dbms/"${dbName}" 2>> error.text
 	if [ $? -eq 0 ]
 	then
 	echo -e "The Database is selected Successfully\n"
-	#tablesMenu
+	source ${pwd}/table.sh
+	clear
 	else
 	echo -e "The database was not found\n" 
 	mainMenu
@@ -61,7 +75,8 @@ function connectToDB(){
 
 function listDatabases(){
 	clear
-	ls ./dbms
+	echo -e "List of the databases exist:\n"
+	ls -F ./dbms | grep /
 	echo -e "\n"
 	mainMenu
 }
@@ -75,7 +90,7 @@ function renameDB(){
 	then
 	echo -e "Database renamed\n"
 	else
-	echo -e "Database renamed failed\n"
+	echo -e "Database renaming failed\n"
 	fi
 	mainMenu
 }
@@ -88,16 +103,14 @@ function deleteDB(){
 	then
 	echo -e "Database is deleted\n"
 	else
-	echo -e "Database is not found\n"
+	echo -e "Database is not exist\n"
 	fi
-	mainMenu
+	mainMenu	
 }
 
-
-
-
-
 mainMenu
+
+
 
 
 
