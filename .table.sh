@@ -183,28 +183,24 @@ function createTable(){
 
 function selectfromTable(){
 	clear
-	select choice in "Select all" "Select entire column" "Select from column" "Exit"
+	select choice in "Select all" "Select entire column" "Select from column" "Return"
 
 	case $choice in
+	
 	"Select all")
-	cat "${tableName}"
+		cat "${tableName}"
 	;;
 	"Select entire column")
-	
+		awk -F: '{if (NR = 2) print $0}' ${tableName}_metaData
+		sed 
 	;;
 	"Select from column")
+		awk -F: '{if (NR = 2) print $0}' ${tableName}_metaData
+		sed -n "" ${tableName}
 	;;
-	"Exit")
+	"Return")
+		tableMenu
 	;;
-
-	#read -p "Enter table name: " tableName
-	#rm "${tableName}" 2>> ../../error.text
-	#if [ $? -eq 0 ]
-	#then
-	#echo -e "Table is dropped"
-	#else
-	#echo -e "Error dropping the table"
-	#fi
 
 	tableMenu
 }
