@@ -46,9 +46,10 @@ function dropTable(){
    rm "${tableName}" 2>> ../../error.text
    if [ $? -eq 0 ]
    then
-   echo -e "Table is dropped"
+   echo -e "Table is dropped\n"
+   rm "${tableName}_metaData" 2>> ../../error.text
    else
-   echo -e "Error dropping the table"
+   echo -e "Error dropping the table\n"
    fi
    tableMenu
 }
@@ -56,6 +57,7 @@ function dropTable(){
 function createTable(){
 	#asking for table name
 	read -p "Please Enter table name: " tableName
+	tableName=`echo ${tableName// /_}`
 
 	if [ -f "${tableName}" ]
 	then

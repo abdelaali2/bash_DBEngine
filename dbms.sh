@@ -40,6 +40,7 @@ done
 
 function CreateDB(){
 	read -p "Please Enter database name: " dbName
+	dbName=`echo ${dbName// /_}`
 	case $dbName in
 	+([a-zA-Z]*))
 	mkdir ./dbms/"${dbName}" 2>> error.text
@@ -65,7 +66,7 @@ function connectToDB(){
 	if [ $? -eq 0 ]
 	then
 	echo -e "The Database is selected Successfully\n"
-	source ${pwd}/table.sh
+	source ${pwd}/.table.sh
 	clear
 	else
 	echo -e "The database was not found\n" 
@@ -84,8 +85,8 @@ function listDatabases(){
 function renameDB(){
 	read -p "Enter database name: " oldDB
 	read -p "Enter the new database name: " newDB
+	newDB=`echo ${newDB// /_}`
 	mv ./dbms/"${oldDB}" ./dbms/"${newDB}" 2>> error.text
-	
 	if [ $? -eq 0 ]
 	then
 	echo -e "Database renamed\n"
