@@ -45,9 +45,9 @@ function CreateDB(){
 	mkdir ./dbms/"${dbName}" 2>> error.text
 	if [ $? -eq 0 ]
 	then
-	echo -e "The database is created\n"
+		echo -e "The database is created\n"
 	else
-	echo -e "The database is already exist\n" 
+		echo -e "The database is already exist\n" 
 	fi
 	;;
 	*)

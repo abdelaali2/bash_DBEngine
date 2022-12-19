@@ -78,6 +78,7 @@ function createTable(){
 			do
 				#asking for the name of the column
 				read -p "Please enter the name of column no.${counter}: " columnName
+				columnName=`${columnName// /_}`
 				case "${columnName}" in
 				+([a-zA-Z]*))
 					#asking for the type of the column
@@ -174,4 +175,35 @@ function createTable(){
 
 }
 
+
+
+
+
+function selectfromTable(){
+	clear
+	select choice in "Select all" "Select entire column" "Select from column" "Exit"
+
+	case $choice in
+	"Select all")
+	cat "${tableName}"
+	;;
+	"Select entire column")
+	
+	;;
+	"Select from column")
+	;;
+	"Exit")
+	;;
+
+	#read -p "Enter table name: " tableName
+	#rm "${tableName}" 2>> ../../error.text
+	#if [ $? -eq 0 ]
+	#then
+	#echo -e "Table is dropped"
+	#else
+	#echo -e "Error dropping the table"
+	#fi
+
+	tableMenu
+}
 tableMenu
