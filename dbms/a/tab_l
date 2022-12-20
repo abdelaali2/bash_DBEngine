@@ -1,5 +1,20 @@
-id:name
-1:aa
-2:ab
-3:ac
-4:ad			
+id:name:course
+1:aa:bash
+2:ab:python
+3:ac:C#
+4:ad:C++
+5:bb:Node.js
+6:bc:bash
+7:bd:AI
+8:cc:Calculus
+9:ca:Admin I
+10:cb:Admin II
+11:cd:OOP
+12:da:Python
+13:db:C++
+14:dd:C
+15:dc:bash
+16:ea:bash
+17:ee:C
+19:eb:C
+20:ec:C#		

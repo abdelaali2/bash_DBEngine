@@ -351,18 +351,50 @@ function selectfromTable() {
 					awk -F: '{if (NR>1) print NR-1,$1}' ${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ${tableName}_metaData | wc -l)`
 					
-					read -p "Enter the No. of the Column you want to Select: " selectedCol
+					read -p "Enter the No. of the Column you want to Select from: " selectedCol
 					case ${selectedCol} in
 						+([1-9]))
 							if [[ $selectedCol -le $listofCol ]]
 							then
-								read -p "Enter the value you want to search for: " requiredData
-								#
-								#
-								#
-								awk -F: -v grab=$selectedCol '{print $0}' ${tableName} 
-								echo $requiredData
-								awk -F: -v grab=$selectedCol '{print $0}' ${tableName} | grep -x [$requiredData]
+								selectedCol=$selectedCol+1
+								sed -n ${selectedCol}p ./${tableName}_metaData | grep int > /dev/null
+								let ifInt=$?
+								if [[ ifInt -eq 0 ]]
+								then
+									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
+									read requiredData
+									index=`awk -F: -v grab=selectedCol '{print $grab}' ${tableName} | grep -wn $requiredData | cut -d: -f1`
+									if [ -z $index ]
+									then
+										echo "***Empty Set***"
+									else
+										for i in $index
+										do
+											sed -n ${i}p ${tableName}
+										done
+									fi
+								else
+									sed -n ${selectedCol}p ${tableName}_metaData | grep string > /dev/null
+									let ifString=$?
+									if [[ ifString -eq 0 ]]
+									then
+										echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
+										read requiredData
+										index=`awk -F: -v grab=selectedCol '{print $grab}' ${tableName} | grep -iwn $requiredData | cut -d: -f1`
+									
+										if [ -z $index ]
+										then
+											echo "***Empty Set***"
+										else
+											for i in $index
+											do
+												sed -n ${i}p ${tableName}
+											done
+										fi
+									fi	
+
+								fi
+
 								echo "Press Eneter to return back to Select Menu"
 								read cont
 								selectfromTable
@@ -373,8 +405,8 @@ function selectfromTable() {
 							fi
 						;;
 						*)
-							clear
-							echo -e "Invalid input!, please enter a numeric input\n"
+							echo -e "Invalid Column No.!\nReturning back to Select Menu"
+							sleep 3
 							selectfromTable
 						;;
 					esac
