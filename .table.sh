@@ -296,7 +296,7 @@ function selectfromTable() {
 
 	if [ -f "${tableName}" ]
 	then
-		select input in "Select all" "Select entire Column" "Select entire Row" "Return"
+		select input in "Select all" "Select entire Column" "Select entire Row" "Select Certain Value" "Return"
 		do
 			case $input in
 			
@@ -395,6 +395,77 @@ function selectfromTable() {
 
 								fi
 
+								echo "Press Eneter to return back to Select Menu"
+								read cont
+								selectfromTable
+							else
+								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								sleep 3
+								selectfromTable
+							fi
+						;;
+						*)
+							echo -e "Invalid Column No.!\nReturning back to Select Menu"
+							sleep 3
+							selectfromTable
+						;;
+					esac
+				;;
+				"Select Certain Value")
+					typeset -i listofCol
+					typeset -i selectedCol
+
+					echo -e "The existing Columns are: \n"
+					awk -F: '{if (NR>1) print NR-1,$1}' ${tableName}_metaData
+					listofCol=`(awk -F: '{if (NR>1) print $0}' ${tableName}_metaData | wc -l)`
+					
+					read -p "Enter the No. of the Column you want to Select from: " selectedCol
+					case ${selectedCol} in
+						+([1-9]))
+							if [[ $selectedCol -le $listofCol ]]
+							then
+								selectedCol=$selectedCol+1
+								sed -n ${selectedCol}p ./${tableName}_metaData | grep int > /dev/null
+								let ifInt=$?
+								selectedCol=$selectedCol-1
+								if [[ ifInt -eq 0 ]]
+								then
+									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
+									read requiredData
+									result=`awk -F: -v grab=$selectedCol '{print $grab}' ${tableName} | grep -in $requiredData`
+									resultLine=`echo $result | awk -F: -v RS=' ' '{print $1}'` 
+									if [ -z $result ]
+									then
+										echo "***Empty Set***"
+									else
+										echo "========================================="
+										echo "  value $requiredData exists in line"
+										echo -e "\t"$resultLine
+										echo "========================================="
+									fi
+								else
+									selectedCol=$selectedCol+1
+									sed -n ${selectedCol}p ${tableName}_metaData | grep string > /dev/null
+									let ifString=$?
+									selectedCol=$selectedCol-1
+									if [[ ifString -eq 0 ]]
+									then
+										echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
+										read requiredData
+										result=`awk -F: -v grab=$selectedCol '{print $grab}' ${tableName} | grep -in $requiredData`
+										resultLine=`echo $result | awk -F: -v RS=' ' '{print $1}'` 
+										if [ -z "$result" ]
+										then
+											echo "***Empty Set***"
+										else
+											echo "========================================="
+											echo "  value $requiredData exists in line"
+											echo -e "\t"$resultLine
+											echo "========================================="
+										fi
+									fi	
+
+								fi
 								echo "Press Eneter to return back to Select Menu"
 								read cont
 								selectfromTable
