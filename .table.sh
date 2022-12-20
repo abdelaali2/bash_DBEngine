@@ -18,9 +18,10 @@ case $choice in
 	renameDB
 ;;
 "Select From Table")
-	deleteDB
+	selectfromTable
 ;;
 "Delete From Table")
+	deleteDB
 ;;
 "Update Table")
 ;;
@@ -80,7 +81,7 @@ function createTable(){
 			do
 				#asking for the name of the column
 				read -p "Please enter the name of column no.${counter}: " columnName
-				columnName=`${columnName// /_}`
+				columnName=`echo ${columnName// /_}`
 				case "${columnName}" in
 				+([a-zA-Z]*))
 					#asking for the type of the column
@@ -172,36 +173,229 @@ function createTable(){
 		createTable
 		;;
 	esac
-
-
-
 }
 
 
 
 
 
-function selectfromTable(){
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+function selectfromTable() {
+
 	clear
-	select choice in "Select all" "Select entire column" "Select from column" "Return"
+	read -p "Please Enter table name: " tableName
+	tableName=`echo ${tableName// /_}`
 
-	case $choice in
-	
-	"Select all")
-		cat "${tableName}"
-	;;
-	"Select entire column")
-		awk -F: '{if (NR = 2) print $0}' ${tableName}_metaData
-		sed 
-	;;
-	"Select from column")
-		awk -F: '{if (NR = 2) print $0}' ${tableName}_metaData
-		sed -n "" ${tableName}
-	;;
-	"Return")
-		tableMenu
-	;;
+	if [ -f "${tableName}" ]
+	then
+		select input in "Select all" "Select entire Column" "Select entire Row" "Return"
+		do
+			case $input in
+			
+				"Select all")
+					typeset -i chkData
+					chkData=`cat $PWD/"${tableName}" | wc -l`
+					if [[ chkData -gt 1 ]]
+					then
+						cat $PWD/"${tableName}" | more
+					else
+						echo "Empty Set"
+					fi
+					echo "Press Eneter to return back to Select Menu"
+					read cont
+					selectfromTable
+				;;
+				"Select entire Column")
+					typeset -i listofCol
+					typeset -i selectedCol
 
+					echo -e "The existing Columns are: \n"
+					awk -F: '{if (NR>1) print NR-1,$1}' ${tableName}_metaData
+					listofCol=`(awk -F: '{if (NR>1) print $0}' ${tableName}_metaData | wc -l)`
+					
+					read -p "Enter the No. of the Column you want to Select: " selectedCol
+					case ${selectedCol} in
+						+([1-9]))
+							if [[ $selectedCol -le $listofCol ]]
+							then
+								awk -F: -v grab=$selectedCol '{print $grab}' ${tableName}
+								echo "Press Eneter to return back to Select Menu"
+								read cont
+								selectfromTable
+							else
+								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								sleep 3
+								selectfromTable
+							fi
+						;;
+						*)
+							clear
+							echo -e "Invalid input!, please enter a numeric input\n"
+							selectfromTable
+						;;
+					esac
+				;;
+				"Select entire Row")
+					typeset -i listofCol
+					typeset -i selectedCol
+
+					echo -e "The existing Columns are: \n"
+					awk -F: '{if (NR>1) print NR-1,$1}' ${tableName}_metaData
+					listofCol=`(awk -F: '{if (NR>1) print $0}' ${tableName}_metaData | wc -l)`
+					
+					read -p "Enter the No. of the Column you want to Select: " selectedCol
+					case ${selectedCol} in
+						+([1-9]))
+							if [[ $selectedCol -le $listofCol ]]
+							then
+								read -p "Enter the value you want to search for: " requiredData
+								#
+								#
+								#
+								awk -F: -v grab=$selectedCol '{print $0}' ${tableName} 
+								echo $requiredData
+								awk -F: -v grab=$selectedCol '{print $0}' ${tableName} | grep -x [$requiredData]
+								echo "Press Eneter to return back to Select Menu"
+								read cont
+								selectfromTable
+							else
+								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								sleep 3
+								selectfromTable
+							fi
+						;;
+						*)
+							clear
+							echo -e "Invalid input!, please enter a numeric input\n"
+							selectfromTable
+						;;
+					esac
+				;;
+				"Return")
+					tableMenu
+				;;
+			esac
+		done
+	else
+		
+		echo -e "Invalid table name!\nReturning back to Select Menu"
+		sleep 3
+		selectfromTable
+	fi
 	tableMenu
+
+
 }
+
+
+
+
 tableMenu
