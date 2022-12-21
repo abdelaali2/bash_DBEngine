@@ -268,6 +268,16 @@ function createTable(){
 
 
 
+
+
+
+
+
+
+
+
+
+
 function selectfromTable() {
 
 	clear
