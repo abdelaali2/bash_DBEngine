@@ -255,6 +255,19 @@ function createTable(){
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 function selectfromTable() {
 
 	clear
@@ -333,7 +346,7 @@ function selectfromTable() {
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								selectedCol=$selectedCol+1
-								sed -n ${selectedCol}p ././.${tableName}_metaData | grep int > /dev/null
+								sed -n ${selectedCol}p ./.${tableName}_metaData | grep int > /dev/null
 								let ifInt=$?
 								if [[ ifInt -eq 0 ]]
 								then
@@ -401,7 +414,7 @@ function selectfromTable() {
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								selectedCol=$selectedCol+1
-								sed -n ${selectedCol}p ././.${tableName}_metaData | grep int > /dev/null
+								sed -n ${selectedCol}p ./.${tableName}_metaData | grep int > /dev/null
 								let ifInt=$?
 								selectedCol=$selectedCol-1
 								if [[ ifInt -eq 0 ]]
@@ -469,8 +482,6 @@ function selectfromTable() {
 		sleep 3
 		selectfromTable
 	fi
-	tableMenu
-
 
 }
 
@@ -520,7 +531,7 @@ function deleteTable () {
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								((selectedCol++))
-								sed -n ${selectedCol}p ././.${tableName}_metaData | grep int > /dev/null
+								sed -n ${selectedCol}p ./.${tableName}_metaData | grep int > /dev/null
 								let ifInt=$?
 								((selectedCol--))
 								if [[ ifInt -eq 0 ]]
@@ -625,7 +636,7 @@ function deleteTable () {
 				;;
 
 				"Delete Certain Value")
-				typeset -i listofCol
+					typeset -i listofCol
 					typeset -i selectedCol
 					typeset -i delDone
 					balnk=''
@@ -640,7 +651,7 @@ function deleteTable () {
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								((selectedCol++))
-								sed -n ${selectedCol}p ././.${tableName}_metaData | grep int > /dev/null
+								sed -n ${selectedCol}p ./.${tableName}_metaData | grep int > /dev/null
 								let ifInt=$?
 								((selectedCol--))
 								if [[ ifInt -eq 0 ]]
@@ -734,12 +745,234 @@ function deleteTable () {
 		deleteTable
 	fi
 
-tableMenu
 
 }
 
 
-#function updateTable (){}
+function updateTable (){
+
+	clear
+	read -p "Please Enter table name: " tableName
+	tableName=`echo ${tableName// /_}`
+	if [ -f "./${tableName}" ]
+	then
+		select input in "Update Value" "Return"
+		do
+			case $input in
+			"Update Value")
+				echo "Table: "$tableName
+				echo -e "The existing Columns are: \n======================="
+				awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
+				listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
+				echo "Enter the No. of the Column you want to Update: "
+				echo "Note: range from 1:99"
+				read -n 2 selectedCol
+				case ${selectedCol} in
+				+([1-9]|[1-9][0-9]))
+					if [[ $selectedCol -le $listofCol ]]
+					then
+					
+						((selectedCol++))
+						sed -n ${selectedCol}p ./.${tableName}_metaData | grep int > /dev/null
+						let ifInt=$?
+						sed -n ${selectedCol}p ./.${tableName}_metaData | grep string > /dev/null
+						let ifString=$?
+						sed -n ${selectedCol}p ./.${tableName}_metaData | grep PK > /dev/null
+						let ifPK=$?
+						((selectedCol--))
+
+						if [[ ifInt -eq 0 ]]
+						then
+							echo -e "You choose an Integer type Column."
+							if [[ ifPK -eq 0 ]]
+							then 
+								echo "This is the PK of the Table"
+								read -p "Enter the data you want to Update: "  requiredData
+								index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | cut -d: -f1`
+								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
+								if [ -z "$index" ]
+								then
+									echo "***Empty Set***"
+									sleep 3
+									updateTable
+								else
+									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo $index
+									read -p "Enter the No. of the line you want to delete from it: " line
+									let trueUpdate=0
+									while [[ trueUpdate -eq 0 ]]
+									do
+										read -p "Enter the new No.: " newData
+										awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $newData > /dev/null
+										let ifFound=$?
+										case $newData in
+										+([0-9]))
+											if [[ ifFound -eq 0 ]]
+											then
+												echo "Error: PK Repetition!"
+											else
+												sed -in "$line s/$requiredData/$newData/" ./${tableName}
+												let upDone=$?
+												if [[ upDone -eq 0 ]]
+												then
+													echo "No. Updated Successfully"
+													((trueUpdate++))
+												else
+													echo "Error: Update Aborted!"
+												fi
+
+											fi
+										;;
+										*)
+										echo -e "Invalid Entry!"
+										;;
+										esac
+									sleep 3 
+									done
+									echo "Press Eneter to return back to Update Menu"
+									read cont
+									updateTable
+								fi
+							else
+								read -p "Enter the data you want to Update: "  requiredData
+								index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | cut -d: -f1`
+								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
+								if [ -z "$index" ]
+								then
+									echo "***Empty Set***"
+									sleep 3
+									updateTable
+								else
+									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo $index
+									read -p "Enter the No. of the line you want to delete from it: " line
+									let trueUpdate=0
+									while [[ trueUpdate -eq 0 ]]
+									do
+										read -p "Enter the new No.: " newData
+										case $newData in
+										+([0-9]))
+											sed -in "$line s/$requiredData/$newData/" ./${tableName}
+											let upDone=$?
+											if [[ upDone -eq 0 ]]
+											then
+												echo "No. Updated Successfully"
+												((trueUpdate++))
+											else
+												echo "Error: Update Aborted!"
+											fi
+										;;
+										*)
+										echo -e "Invalid Entry!"
+										;;
+										esac
+									sleep 3 
+									done
+									echo "Press Eneter to return back to Update Menu"
+									read cont
+									updateTable
+								fi
+							fi
+
+						elif [[ ifString -eq 0 ]]
+						then
+							echo -e "You choose an String type Column."
+							if [[ ifPK -eq 0 ]]
+							then 
+								echo "This is the PK of the Table"
+								read -p "Enter the data you want to Update: "  requiredData
+								index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1`
+								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
+								if [ -z "$index" ]
+								then
+									echo "***Empty Set***"
+									sleep 3
+									updateTable
+								else
+									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo $index
+									read -p "Enter the No. of the line you want to delete from it: " line
+									read -p "Enter the new No.: " newData
+									awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $newData
+									let ifFound=$?
+									let trueUpdate=0
+									while [ trueUpdate -eq 0 ]
+									do
+										if [[ ifFound -eq 0 ]]
+										then
+											echo "Error: PK Repetition!"
+										else
+											sed -in "$line s/$requiredData/$newData/" ./${tableName}
+											let upDone=$?
+											if [[ upDone -eq 0 ]]
+											then
+												echo "No. Updated Successfully"
+												((trueUpdate++))
+											else
+												echo "Error: Update Aborted!"
+											fi
+
+										fi
+									done
+								fi
+							else
+								read -p "Enter the data you want to Update: "  requiredData
+								index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1`
+								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
+								if [ -z "$index" ]
+								then
+									echo "***Empty Set***"
+									sleep 3
+									updateTable
+								else
+									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo $index
+									read -p "Enter the No. of the line you want to delete from it: " line
+
+									let trueUpdate=0
+									while [ trueUpdate -eq 0 ]
+									do
+										sed -in "$line s/$requiredData/$newData/" ./${tableName}
+										let upDone=$?
+										if [[ upDone -eq 0 ]]
+										then
+											echo "No. Updated Successfully"
+											((trueUpdate++))
+										else
+											echo "Error: Update Aborted!"
+										fi
+
+									done
+								fi
+							fi
+						fi
+
+					else
+						echo -e "Invalid Column No.!\nReturning back to Update Menu"
+						sleep 3
+						updateTable
+					fi
+				;;
+				*)
+					echo -e "Invalid Column No.!\nReturning back to Update Menu"
+					sleep 3
+					updateTable
+				;;
+				esac
+			;;
+			"Return")
+				tableMenu
+			;;
+			esac
+
+		done
+	else
+		
+		echo -e "Invalid table name!\nReturning back to Update Menu"
+		sleep 3
+		updateTable
+	fi
+}
 
 
 tableMenu
