@@ -22,4 +22,23 @@ mv: cannot stat './dbms/ffdsf': No such file or directory
 rm: cannot remove './dbms/dfgdscg': No such file or directory
 ./dbms.sh: line 65: cd: ./dbms/asdasd: No such file or directory
 rm: cannot remove 'asdas': No such file or directory
+<<<<<<< HEAD
 ./dbms.sh: line 66: cd: ./dbms/ش: No such file or directory
+=======
+./dbms.sh: line 65: cd: ./dbms/3: No such file or directory
+rm: cannot remove 'sadas': No such file or directory
+./dbms.sh: line 65: cd: ./dbms/3: No such file or directory
+rm: cannot remove 'student_metaData': No such file or directory
+./dbms.sh: line 65: cd: ./dbms/3: No such file or directory
+./dbms.sh: line 65: cd: ./dbms/3: No such file or directory
+./dbms.sh: line 65: cd: ./dbms/ibarahem badr: No such file or directory
+./dbms.sh: line 65: cd: ./dbms/omar hesham': No such file or directory
+./dbms.sh: line 65: cd: ./dbms/omar hesahm: No such file or directory
+rm: cannot remove './dbms/sdaa_sdajas': No such file or directory
+rm: cannot remove './dbms/ibrahem_badr': No such file or directory
+rm: cannot remove './dbms/ibrahem_badr': No such file or directory
+rm: cannot remove './dbms/ibrahem_badr': No such file or directory
+rm: cannot remove './dbms/ibrahem_badr': No such file or directory
+rm: cannot remove './dbms/as': No such file or directory
+./dbms.sh: line 65: cd: ./dbms/sa: No such file or directory
+>>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
