@@ -2,6 +2,13 @@
 
 shopt -s extglob
 export LC_COLLATE=C
+Red='\033[0;31m'
+Green='\033[0;32m'
+NC='\033[0m'
+Yellow='\033[0;33m'
+On_IGreen='\033[0;102m'
+On_IRed='\033[0;101m'
+On_IYellow='\033[0;103m'
 
 function tableMenu() {
 	select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Exit" "Return"; do
@@ -34,7 +41,7 @@ function tableMenu() {
 			mainMenu
 			;;
 		*)
-			echo -e "Please choose from the options available!\n"
+			echo -e "${On_IRed}Please choose from the options available!${NC}\n"
 			tableMenu
 			;;
 		esac
@@ -43,7 +50,7 @@ function tableMenu() {
 
 function listTables() {
 	clear
-	echo -e "List of the tables exist:\n"
+	echo -e "${On_IGreen}List of the tables exist:${NC}\n"
 	ls . 2>>/dev/null
 	echo -e "\n"
 	tableMenu
@@ -53,7 +60,7 @@ function dropTable() {
 	read -e -p "Enter table name: " tableName
 	case $tableName in
 	+([a-zA-Z]*))
-		echo "Are you sure you want to delete table ${tableName}"
+		echo -e "${On_IYellow}Are you sure you want to delete table ${tableName}${NC}"
 		select ch in "Yes" "No"; do
 			case $ch in
 			"Yes")
