@@ -50,6 +50,7 @@ function CreateDB() {
 	fi
 
 	case $dbName in
+
 	+([a-zA-Z]*))
 		mkdir ./dbms/"${dbName}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
@@ -61,8 +62,10 @@ function CreateDB() {
 	*)
 		clear
 		echo -e "${On_IRed}Invalid,Database name should not start with a number or a specail character\n${NC}"
+
 		;;
 	esac
+	
 	mainMenu
 }
 
