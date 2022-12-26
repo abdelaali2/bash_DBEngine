@@ -50,20 +50,6 @@ function CreateDB() {
 	fi
 
 	case $dbName in
-<<<<<<< HEAD
-		+([a-zA-Z]*))
-			mkdir ./dbms/"${dbName}" 2>> error.text
-			if [ $? -eq 0 ]
-			then
-				echo -e "The database is created\n"
-			else
-				echo -e "The database is already exist\n" 
-			fi
-		;;
-		*)
-			clear
-			echo -e "Invalid Naming Conventions database name should not start with a number or a specail character\n"
-=======
 	+([a-zA-Z]*))
 		mkdir ./dbms/"${dbName}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
@@ -75,7 +61,6 @@ function CreateDB() {
 	*)
 		clear
 		echo -e "${On_IRed}Invalid,Database name should not start with a number or a specail character\n${NC}"
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 		;;
 	esac
 	

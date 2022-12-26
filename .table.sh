@@ -3,41 +3,6 @@
 shopt -s extglob
 export LC_COLLATE=C
 
-<<<<<<< HEAD
-function tableMenu(){
-select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Exit"
-do
-case $choice in
-"Create Table")
-	createTable
-;;
-"List Tables")
-	listTables
-;; 
-"Drop Table")
-	dropTable
-;;
-"Insert into Table")
-	renameDB
-;;
-"Select From Table")
-	selectfromTable
-;;
-"Delete From Table")
-	deleteTable
-;;
-"Update Table")
-	updateTable
-;;
-"Exit")
-exit
-;;
-*)
-echo -e "Please choose from the options available!\n"
-tableMenu
-esac
-done
-=======
 function tableMenu() {
 	select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Exit" "Return"; do
 		case $choice in
@@ -53,13 +18,15 @@ function tableMenu() {
 		"Insert into Table")
 			insert
 			;;
-		"Select From Table") ;;
-
-		\
-			"Delete From Table") ;;
-
-		"Update Table") ;;
-
+		"Select From Table") 
+			selectfromTable
+		;;
+		"Delete From Table") 
+			deleteTable
+		;;
+		"Update Table")
+			updateTable
+		 ;;
 		"Exit")
 			exit
 			;;
@@ -74,7 +41,6 @@ function tableMenu() {
 			;;
 		esac
 	done
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 }
 
 function listTables() {
@@ -85,19 +51,7 @@ function listTables() {
 	tableMenu
 }
 
-<<<<<<< HEAD
-function dropTable(){
-   read -p "Enter table name: " tableName
-   rm "./${tableName}" 2>> ../../error.text
-   if [ $? -eq 0 ]
-   then
-   echo -e "Table is dropped\n"
-   rm "./.${tableName}_metaData" 2>> ../../error.text
-   else
-   echo -e "Error dropping the table\n"
-   fi
-   tableMenu
-=======
+
 function dropTable() {
 	read -e -p "Enter table name: " tableName
 	case $tableName in
@@ -109,7 +63,7 @@ function dropTable() {
 				rm "${tableName}" 2>>/dev/null
 				if [ $? -eq 0 ]; then
 					echo -e "Table is dropped\n"
-					rm "${tableName}_metaData" 2>>/dev/null
+					rm ".${tableName}_metaData" 2>>/dev/null
 				else
 					echo -e "Error dropping the table\n"
 				fi
@@ -130,24 +84,10 @@ function dropTable() {
 		;;
 	esac
 	tableMenu
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 }
 
 function createTable() {
 	#asking for table name
-<<<<<<< HEAD
-	read -p "Please Enter table name: " tableName
-	tableName=`echo ${tableName// /_}`
-
-	if [ -f "./${tableName}" ]
-	then
-		echo "Table is already exist"
-		tableMenu
-	fi
-
-	case "./${tableName}" in
-		+([a-zA-Z]*))
-=======
 	read -e -p "Please Enter table name: " tableName
 	tableName=$(echo ${tableName// /_})
 	case $tableName in
@@ -161,7 +101,6 @@ function createTable() {
 
 	case "${tableName}" in
 	+([a-zA-Z]*))
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 		#asking for no. of col
 		read -p "Please enter number of columns: " colNumber
 		case ${colNumber} in
@@ -174,11 +113,7 @@ function createTable() {
 			while [ ${counter} -le ${colNumber} ]; do
 				#asking for the name of the column
 				read -p "Please enter the name of column no.${counter}: " columnName
-<<<<<<< HEAD
-				columnName=`echo ${columnName// /_}`
-=======
 				columnName=$(echo ${columnName// /_})
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 				case "${columnName}" in
 				+([a-zA-Z]*))
 					#asking for the type of the column
@@ -240,20 +175,11 @@ function createTable() {
 
 			done #end of while
 
-<<<<<<< HEAD
-			touch "./.${tableName}_metaData"
-			touch "./${tableName}"
-			echo -e $metaData  >> "./.${tableName}_metaData"
-			echo -e $tableHeader >> ./${tableName}
-			if [ $? -eq 0 ]
-				then
-=======
 			touch ".${tableName}_metaData"
 			touch "${tableName}"
 			echo -e $metaData >>".${tableName}_metaData"
 			echo -e $tableHeader >>${tableName}
 			if [ $? -eq 0 ]; then
->>>>>>> 6e850cfdea3dbc48f0f8b4d7de3b1091f77a7cad
 				echo "Table Created Successfully"
 				tableMenu
 			else
@@ -276,92 +202,6 @@ function createTable() {
 	esac
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
 
 function insert() {
 	read -e -p "Enter table name: " tName
@@ -421,18 +261,7 @@ function insert() {
 	row=""
 	tableMenu
 
-
-
-
-
-
-
-
-
-
-
-
-
+}
 
 
 
@@ -455,7 +284,7 @@ function selectfromTable() {
 					then
 						cat $PWD/"./${tableName}" | more
 					else
-						echo "Empty Set"
+						echo "***Empty Set***"
 					fi
 					echo "Press Eneter to return back to Select Menu"
 					read cont
@@ -469,9 +298,11 @@ function selectfromTable() {
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
 					
-					read -p "Enter the No. of the Column you want to Select: " selectedCol
+					echo "Enter the No. of the Column you want to Select from: "
+					echo "Note: range from 1:99"
+					read -n 2 selectedCol
 					case ${selectedCol} in
-						+([1-9]))
+						+([1-9]|[1-9][0-9]))
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								header=`sed -n '1p' ./${tableName} | awk -F: -v grab=$selectedCol '{print $grab}'`
@@ -508,9 +339,11 @@ function selectfromTable() {
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
 					
-					read -p "Enter the No. of the Column you want to Select from: " selectedCol
+					echo "Enter the No. of the Column you want to Select from: "
+					echo "Note: range from 1:99"
+					read -n 2 selectedCol
 					case ${selectedCol} in
-						+([1-9]))
+						+([1-9]|[1-9][0-9]))
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								selectedCol=$selectedCol+1
@@ -576,9 +409,11 @@ function selectfromTable() {
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
 					
-					read -p "Enter the No. of the Column you want to Select from: " selectedCol
-					case ${selectedCol} in
-						+([1-9]))
+					echo "Enter the No. of the Column you want to Select from: "
+					echo "Note: range from 1:99"
+					read -n 2 selectedCol
+					case $selectedCol in
+						+([1-9]|[1-9][0-9]))
 							if [[ $selectedCol -le $listofCol ]]
 							then
 								selectedCol=$selectedCol+1
@@ -589,6 +424,10 @@ function selectfromTable() {
 								then
 									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
 									read requiredData
+									while [[ -z $requiredData ]]
+									do
+										read -p "Invalid Entry! Enter valid data: " requiredData ;
+									done
 									result=`awk -F: -v grab=$selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData`
 									resultLine=`echo $result | awk -F: -v RS=' ' '{print $1}'` 
 									if [ -z $result ]
@@ -669,7 +508,8 @@ function deleteTable () {
 					chkData=`cat $PWD/"./${tableName}" | wc -l`
 					if [[ chkData -gt 1 ]]
 					then
-						cat /dev/null > $PWD/"./${tableName}"
+						header=`sed -n '1p' ./${tableName}`
+						echo $header>./${tableName}
 						let delDone=$?
 						if [[ delDone -eq 0 ]]
 						then
@@ -678,7 +518,7 @@ function deleteTable () {
 							echo "Error: Delete Aborted!"
 						fi
 					else
-						echo "Empty Set"
+						echo "***Empty Set***"
 					fi
 					echo "Press Eneter to return back to Delete Menu"
 					read cont
@@ -719,6 +559,7 @@ function deleteTable () {
 											for (( i=1; i<=$indexlist; i++))
 											do
 												line=`echo $index | cut -d' ' -f$i `
+												echo $line
 												if [[ $i -gt 1 ]]
 												then
 													for ((j=1;j<=decrement;j++))
@@ -726,7 +567,6 @@ function deleteTable () {
 														((line--))
 													done
 												fi
-												echo $line
 												sed -in ${line}d ./${tableName}
 												delDone=$?
 												if [[ delDone -eq 0 ]]
@@ -746,8 +586,10 @@ function deleteTable () {
 									;;
 									esac
 								else
+									(( selectedCol++ ))
 									sed -n ${selectedCol}p ./.${tableName}_metaData | grep string > /dev/null
 									let ifString=$?
+									(( selectedCol-- ))
 									if [[ ifString -eq 0 ]]
 									then
 										echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
@@ -854,8 +696,10 @@ function deleteTable () {
 									;;
 									esac
 								else
+									(( selectedCol++ ))
 									sed -n ${selectedCol}p ./.${tableName}_metaData | grep string > /dev/null
 									let ifString=$?
+									(( selectedCol-- ))
 									if [[ ifString -eq 0 ]]
 									then
 										echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
@@ -966,7 +810,7 @@ function updateTable (){
 								else
 									echo -e "Value existing in "$indexlist" records.\n======================="
 									echo $index
-									read -p "Enter the No. of the line you want to delete from it: " line
+									read -p "Enter the No. of the line you want to Update from it: " line
 									let trueUpdate=0
 									while [[ trueUpdate -eq 0 ]]
 									do
@@ -995,7 +839,6 @@ function updateTable (){
 										echo -e "Invalid Entry!"
 										;;
 										esac
-									sleep 3 
 									done
 									echo "Press Eneter to return back to Update Menu"
 									read cont
