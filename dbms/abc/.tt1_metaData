@@ -1,0 +1,4 @@
+Field:Type:key
+c1:int:
+col2:int:PK
+c3:string:

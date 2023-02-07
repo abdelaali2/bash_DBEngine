@@ -35,6 +35,7 @@ function mainMenu() {
 			exit
 			;;
 		*)
+			clear
 			echo -e "${On_IRed}Please choose from the options available!\n${NC}"
 			mainMenu
 			;;
@@ -53,14 +54,16 @@ function CreateDB() {
 	+([a-zA-Z]*))
 		mkdir ./dbms/"${dbName}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
+			clear
 			echo -e "${On_IGreen}The database is created\n${NC}"
 		else
+			clear
 			echo -e "${On_IRed}The database already exists\n${NC}"
 		fi
 		;;
 	*)
 		clear
-		echo -e "${On_IRed}Invalid,Database name should not start with a number or a specail character\n${NC}"
+		echo -e "${On_IRed}Invalid,Database name should not start with a number or a special character\n${NC}"
 		;;
 	esac
 	
@@ -75,10 +78,12 @@ function connectToDB() {
 	+([a-zA-Z]*))
 		cd ./dbms/"${dbName}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
+			clear
 			echo -e "${On_IGreen}The Database is selected Successfully\n${NC}"
 			source ${pwd}/.table.sh
 			clear
 		else
+			clear
 			echo -e "${On_IRed}The database was not found\n${NC}"
 			mainMenu
 		fi
@@ -108,8 +113,10 @@ function renameDB() {
 	+([a-zA-Z]*))
 		mv ./dbms/"${oldDB}" ./dbms/"${newDB}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
+			clear
 			echo -e "${On_IGreen}Database renamed\n${NC}"
 		else
+			clear
 			echo -e "${On_IRed}Database renaming failed\n${NC}"
 		fi
 		;;
@@ -133,8 +140,10 @@ function deleteDB() {
 			"Yes")
 				rm -r ./dbms/"${name}" 2>>/dev/null
 				if [ $? -eq 0 ]; then
+					clear
 					echo -e "${On_IGreen}Database is deleted\n${NC}"
 				else
+					clear
 					echo -e "${On_IRed}Database does not exist\n${NC}"
 				fi
 				break
@@ -143,6 +152,7 @@ function deleteDB() {
 				break
 				;;
 			*)
+				clear
 				echo -e "${On_IRed}Please choose from the options avaliable!${NC}"
 				;;
 			esac

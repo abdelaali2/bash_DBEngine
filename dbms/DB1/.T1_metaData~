@@ -1,7 +1,0 @@
-Field:Type:key
-C1:int:
-C2:int:PK
-Field:Type:key
-C1:string:
-C2:int:PK
-C3:string:

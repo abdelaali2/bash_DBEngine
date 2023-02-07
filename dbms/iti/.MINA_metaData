@@ -1,0 +1,4 @@
+Field:Type:key
+id:int:PK
+name:string:
+age:int:

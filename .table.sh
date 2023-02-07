@@ -2,6 +2,12 @@
 
 shopt -s extglob
 export LC_COLLATE=C
+Red='\033[0;31m'
+Green='\033[0;32m'
+NC='\033[0m'
+Yellow='\033[0;33m'
+On_IGreen='\033[0;102m'
+On_IRed='\033[0;101m'
 
 function tableMenu() {
 	select choice in "Create Table" "List Tables" "Drop Table" "Insert into Table" "Select From Table" "Delete From Table" "Update Table" "Exit" "Return"; do
@@ -56,16 +62,18 @@ function dropTable() {
 	read -e -p "Enter table name: " tableName
 	case $tableName in
 	+([a-zA-Z]*))
-		echo "Are you sure you want to delete table ${tableName}"
+		echo -e "${Yellow}Are you sure you want to delete table ${tableName}${NC}"
 		select ch in "Yes" "No"; do
 			case $ch in
 			"Yes")
 				rm "${tableName}" 2>>/dev/null
 				if [ $? -eq 0 ]; then
-					echo -e "Table is dropped\n"
+					clear
+					echo -e "${On_IGreen}Table is dropped\n${NC}"
 					rm ".${tableName}_metaData" 2>>/dev/null
 				else
-					echo -e "Error dropping the table\n"
+					clear
+					echo -e "${On_IRed}Error dropping the table\n${NC}"
 				fi
 				break
 				;;
@@ -73,14 +81,14 @@ function dropTable() {
 				break
 				;;
 			*)
-				echo "Please choose from the options avaliable!"
+				echo -e "${On_IRed}Please choose from the options avaliable!${NC}"
 				;;
 			esac
 		done
 		;;
 	*)
 		clear
-		echo -e "Invalid input!\n"
+		echo -e "${On_IRed}Invalid input!\n${NC}"
 		;;
 	esac
 	tableMenu
@@ -92,7 +100,7 @@ function createTable() {
 	tableName=$(echo ${tableName// /_})
 	case $tableName in
 	+([a-zA-Z]*))
-		test -f ${tableName} && echo -e "${tableName} is already exist" && tableMenu
+		test -f ${tableName} && echo -e "${On_IRed}${tableName} already exists${NC}" && tableMenu
 		;;
 	*)
 		break
@@ -117,7 +125,7 @@ function createTable() {
 				case "${columnName}" in
 				+([a-zA-Z]*))
 					#asking for the type of the column
-					echo "choose type of column ${columnName}"
+					echo -e "${Yellow}choose type of column ${columnName}${NC}"
 					select ch in "integer" "string"; do
 						case $ch in
 						"integer")
@@ -129,13 +137,13 @@ function createTable() {
 							break
 							;;
 						*)
-							echo "Invalid choice! Please choose from the options available"
+							echo -e "${On_IRed}Invalid choice! Please choose from the options available${NC}"
 							;;
 						esac
 					done
 					;;
 				*)
-					echo "Invalid name"
+					echo -e "${On_IRed}Invalid name${NC}"
 					createTable
 					break
 					;;
@@ -143,7 +151,7 @@ function createTable() {
 
 				#asking for pk
 				if [ -z ${primaryKey} ]; then
-					echo -e "Do you want this column to be the pk?"
+					echo -e "${Yellow}Do you want this column to be the pk?${NC}"
 					select ch in "Yes" "No"; do
 						case $ch in
 						"Yes")
@@ -156,7 +164,7 @@ function createTable() {
 							break
 							;;
 						*)
-							echo "Invalid choice! Please choose from the options available"
+							echo -e "${On_IRed}Invalid choice! Please choose from the options available${NC}"
 							;;
 						esac
 					done
@@ -180,23 +188,25 @@ function createTable() {
 			echo -e $metaData >>".${tableName}_metaData"
 			echo -e $tableHeader >>${tableName}
 			if [ $? -eq 0 ]; then
-				echo "Table Created Successfully"
+				clear
+				echo -e "${On_IGreen}Table Created Successfully${NC}"
 				tableMenu
 			else
-				echo "Error Creating Table $tableName"
+				clear
+				echo -e "${On_IRed}Error Creating Table $tableName${NC}"
 				tableMenu
 			fi
 			;;
 		*)
 			clear
-			echo -e "Invalid input, please enter a numeric input\n"
+			echo -e "${On_IRed}Invalid input, please enter a numeric input\n${NC}"
 			createTable
 			;;
 		esac
 		;;
 	*)
 		clear
-		echo -e "Invalid Naming Convention table name should not start with a number or a specail character\n"
+		echo -e "${On_IRed}Invalid Naming Convention table name should not start with a number or a specail character\n${NC}"
 		createTable
 		;;
 	esac
@@ -208,10 +218,11 @@ function insert() {
 	tName=$(echo ${tName// /_})
 	case $tName in
 	+([a-zA-Z]*))
-		test ! -f ${tName} && echo -e "${tName} does not exist" && tableMenu
+		test ! -f ${tName} && echo -e "${On_IRed}${tName} does not exist${NC}" && tableMenu
 		;;
 	*)
-		echo "Invalid input!"
+		clear
+		echo -e "${On_IRed}Invalid input!${NC}"
 		tableMenu
 		;;
 	esac
@@ -231,7 +242,7 @@ function insert() {
 		#habd2 a3ml check 3ala el data
 		if [ "${columnType}" = "int" ]; then
 			until [[ $data =~ ^[0-9]*$ ]]; do
-				echo -e "Invalid input, int data type must be numbers!"
+				echo -e "${On_IRed}Invalid input, int data type must be numbers!${NC}"
 				read -e -p "Enter the data in ${columnName} (${columnType}): " data
 			done
 		fi
@@ -239,7 +250,7 @@ function insert() {
 		if [ "${columnKey}" = "PK" ]; then
 
 			until ! [[ ($data =~ ^[$(awk 'BEGIN{FS="|" ; ORS=" "}{if(NR != 1)print $(('$i'-1))}' ${tName})]$ || -z ${data}) ]]; do
-				echo -e "invalid input for Primary Key , Primary key should be unique and not null!\n"
+				echo -e "${On_IRed}invalid input for Primary Key , Primary key should be unique and not null!\n${NC}"
 				read -e -p "Enter the data in ${columnName} (${columnType}): " data
 			done
 		fi
@@ -254,9 +265,11 @@ function insert() {
 
 	echo -e $row >>$tName
 	if [ $? -eq 0 ]; then
-		echo -e "Data Inserted Successfully\n"
+		clear
+		echo -e "${On_IGreen}Data Inserted Successfully\n${NC}"
 	else
-		echo -e "Error Inserting Data into Table ${tName}\n"
+		clear
+		echo -e "${On_IRed}Error Inserting Data into Table ${tName}\n${NC}"
 	fi
 	row=""
 	tableMenu
@@ -284,7 +297,7 @@ function selectfromTable() {
 					then
 						cat $PWD/"./${tableName}" | more
 					else
-						echo "***Empty Set***"
+						echo -e "${Yellow}***Empty Set***${NC}"
 					fi
 					echo "Press Eneter to return back to Select Menu"
 					read cont
@@ -292,7 +305,6 @@ function selectfromTable() {
 				;;
 				"Select Entire Column")
 					typeset -i listofCol
-					typeset -i selectedCol
 
 					echo -e "The existing Columns are: \n======================="
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
@@ -310,7 +322,7 @@ function selectfromTable() {
 								if [[ -z $result ]]
 									then
 										echo $header
-										echo "***Empty Set***"
+										echo -e "${Yellow}***Empty Set***${NC}"
 									else
 										echo $header
 										awk -F: -v grab=$selectedCol '{if (NR>1) print $grab}' ./${tableName}
@@ -319,21 +331,20 @@ function selectfromTable() {
 								read cont
 								selectfromTable
 							else
-								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Select Menu"
 								sleep 3
 								selectfromTable
 							fi
 						;;
 						*)
-							clear
-							echo -e "Invalid input!, please enter a numeric input\n"
+							echo -e "${On_IRed}Invalid input!${NC}\nReturning back to Select Menu"
+							sleep 3
 							selectfromTable
 						;;
 					esac
 				;;
 				"Select Entire Row")
 					typeset -i listofCol
-					typeset -i selectedCol
 
 					echo -e "The existing Columns are: \n======================="
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
@@ -351,12 +362,12 @@ function selectfromTable() {
 								let ifInt=$?
 								if [[ ifInt -eq 0 ]]
 								then
-									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
+									echo -e "${On_IGreen}You choose an Integer type Column.\n${NC}Please enter the No. you want to search for"
 									read requiredData
 									index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | cut -d: -f1`
 									if [ -z $index ]
 									then
-										echo "***Empty Set***"
+										echo -e "${Yellow}***Empty Set***${NC}"
 									else
 										for i in $index
 										do
@@ -368,13 +379,13 @@ function selectfromTable() {
 									let ifString=$?
 									if [[ ifString -eq 0 ]]
 									then
-										echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
+										echo -e "${On_IGreen}You choose a String type Column.\n${NC}Please enter the word you want to search for"
 										read requiredData
 										index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -iwn $requiredData | cut -d: -f1`
 									
 										if [ -z $index ]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
 											for i in $index
 											do
@@ -389,13 +400,13 @@ function selectfromTable() {
 								read cont
 								selectfromTable
 							else
-								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Select Menu"
 								sleep 3
 								selectfromTable
 							fi
 						;;
 						*)
-							echo -e "Invalid Column No.!\nReturning back to Select Menu"
+							echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Select Menu"
 							sleep 3
 							selectfromTable
 						;;
@@ -403,7 +414,6 @@ function selectfromTable() {
 				;;
 				"Select Certain Value")
 					typeset -i listofCol
-					typeset -i selectedCol
 
 					echo -e "The existing Columns are: \n======================="
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
@@ -422,20 +432,21 @@ function selectfromTable() {
 								selectedCol=$selectedCol-1
 								if [[ ifInt -eq 0 ]]
 								then
-									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
+									echo -e "${On_IGreen}You choose an Integer type Column.\n${NC}Please enter the No. you want to search for"
 									read requiredData
 									while [[ -z $requiredData ]]
 									do
-										read -p "Invalid Entry! Enter valid data: " requiredData ;
+										echo -e "${On_IRed}Invalid Entry! Enter valid data: ${NC}"
+										read requiredData ;
 									done
 									result=`awk -F: -v grab=$selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData`
 									resultLine=`echo $result | awk -F: -v RS=' ' '{print $1}'` 
 									if [ -z $result ]
 									then
-										echo "***Empty Set***"
+										echo -e "${Yellow}***Empty Set***${NC}"
 									else
 										echo "========================================="
-										echo "  value $requiredData exists in line"
+										echo -e "  ${On_IGreen}value $requiredData exists in line${NC}"
 										echo -e "\t"$resultLine
 										echo "========================================="
 									fi
@@ -446,16 +457,16 @@ function selectfromTable() {
 									selectedCol=$selectedCol-1
 									if [[ ifString -eq 0 ]]
 									then
-										echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
+										echo -e "${On_IGreen}You choose a String type Column.\n${NC}Please enter the word you want to search for"
 										read requiredData
 										result=`awk -F: -v grab=$selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData`
 										resultLine=`echo $result | awk -F: -v RS=' ' '{print $1}'` 
 										if [ -z "$result" ]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
 											echo "========================================="
-											echo "  value $requiredData exists in line"
+											echo -e "  ${On_IGreen}value $requiredData exists in line${NC}"
 											echo -e "\t"$resultLine
 											echo "========================================="
 										fi
@@ -466,13 +477,13 @@ function selectfromTable() {
 								read cont
 								selectfromTable
 							else
-								echo -e "Invalid Column No.!\nReturning back to Select Menu"
+								echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Select Menu"
 								sleep 3
 								selectfromTable
 							fi
 						;;
 						*)
-							echo -e "Invalid Column No.!\nReturning back to Select Menu"
+							echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Select Menu"
 							sleep 3
 							selectfromTable
 						;;
@@ -485,7 +496,7 @@ function selectfromTable() {
 		done
 	else
 		
-		echo -e "Invalid table name!\nReturning back to Select Menu"
+		echo -e "${On_IRed}Invalid table name!${NC}\nReturning back to Select Menu"
 		sleep 3
 		selectfromTable
 	fi
@@ -513,12 +524,12 @@ function deleteTable () {
 						let delDone=$?
 						if [[ delDone -eq 0 ]]
 						then
-							echo "Data Deleted Successfully"
+							echo -e "${On_IGreen}Data Deleted Successfully${NC}"
 						else
-							echo "Error: Delete Aborted!"
+							echo -e "${On_IRed}Error: Delete Aborted!${NC}"
 						fi
 					else
-						echo "***Empty Set***"
+						echo -e "${Yellow}***Empty Set***${NC}"
 					fi
 					echo "Press Eneter to return back to Delete Menu"
 					read cont
@@ -526,8 +537,8 @@ function deleteTable () {
 				;;
 				"Delete Entire Row")
 					typeset -i listofCol
-					typeset -i selectedCol
 					typeset -i delDone
+
 					echo -e "The existing Columns are: \n======================="
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
@@ -544,7 +555,7 @@ function deleteTable () {
 								((selectedCol--))
 								if [[ ifInt -eq 0 ]]
 								then
-									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to Delete"
+									echo -e "${On_IGreen}You choose an Integer type Column.\n${NC}Please enter the No. you want to Delete"
 									read requiredData
 									case ${requiredData} in
 									+([0-9]))
@@ -552,10 +563,10 @@ function deleteTable () {
 										indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
 										if [[ -z $index ]]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
 											let decrement=0
-											echo "Value existing in "$indexlist" records."
+											echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}"
 											for (( i=1; i<=$indexlist; i++))
 											do
 												line=`echo $index | cut -d' ' -f$i `
@@ -571,16 +582,16 @@ function deleteTable () {
 												delDone=$?
 												if [[ delDone -eq 0 ]]
 												then
-													echo "Row Deleted Successfully"
+													echo -e "${On_IGreen}Row Deleted Successfully${NC}"
 													(( decrement++ ))
 												else
-													echo "Error: Delete Aborted!"
+													echo -e "${On_IRed}Error: Delete Aborted!${NC}"
 												fi
 											done
 										fi
 									;;
 									*)
-									echo -e "Invalid Entry!\nReturning back to Delete Menu"
+									echo -e "${On_IRed}Invalid Entry!${NC}\nReturning back to Delete Menu"
 									sleep 3
 									deleteTable
 									;;
@@ -592,16 +603,16 @@ function deleteTable () {
 									(( selectedCol-- ))
 									if [[ ifString -eq 0 ]]
 									then
-										echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
+										echo -e "${On_IGreen}You choose a String type Column.\n${NC}Please enter the word you want to Delete"
 										read requiredData
 										index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1`
 										indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
 										if [ -z $index ]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
 											let decrement=0
-											echo "Value existing in "$indexlist" records."
+											echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}"
 											for (( i=1; i<=$indexlist; i++))
 											do
 												line=`echo $index | cut -d' ' -f$i `
@@ -617,10 +628,10 @@ function deleteTable () {
 												delDone=$?
 												if [[ delDone -eq 0 ]]
 												then
-													echo "Row Deleted Successfully"
+													echo -e "${On_IGreen}Row Deleted Successfully${NC}"
 													(( decrement++ ))
 												else
-													echo "Error: Delete Aborted!"
+													echo -e "${On_IRed}Error: Delete Aborted!${NC}"
 												fi
 											done
 										fi
@@ -632,13 +643,13 @@ function deleteTable () {
 								read cont
 								deleteTable
 							else
-								echo -e "Invalid Column No.!\nReturning back to Delete Menu"
+								echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Delete Menu"
 								sleep 3
 								deleteTable
 							fi
 						;;
 						*)
-							echo -e "Invalid Column No.!\nReturning back to Delete Menu"
+							echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Delete Menu"
 							sleep 3
 							deleteTable
 						;;
@@ -647,9 +658,9 @@ function deleteTable () {
 
 				"Delete Certain Value")
 					typeset -i listofCol
-					typeset -i selectedCol
 					typeset -i delDone
 					balnk=''
+
 					echo -e "The existing Columns are: \n======================="
 					awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
 					listofCol=`(awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l)`
@@ -666,7 +677,7 @@ function deleteTable () {
 								((selectedCol--))
 								if [[ ifInt -eq 0 ]]
 								then
-									echo -e "You choose an Integer type Column.\nPlease enter the No. you want to Delete"
+									echo -e "${On_IGreen}You choose an Integer type Column.\n${NC}Please enter the No. you want to Delete"
 									read requiredData
 									case ${requiredData} in
 									+([0-9]))
@@ -674,23 +685,23 @@ function deleteTable () {
 										indexlist=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
 										if [ -z "$index" ]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
-											echo -e "Value existing in "$indexlist" records.\n======================="
+											echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 											echo $index
 											read -p "Enter the No. of the line you want to delete from it: " line
 											sed -in "$line s/$requiredData/$blank/" ./${tableName}
 											delDone=$?
 											if [[ delDone -eq 0 ]]
 											then
-												echo "Value Deleted Successfully"
+												echo -e "${On_IGreen}Value Deleted Successfully${NC}"
  											else
-												echo "Error: Delete Aborted!"
+												echo -e "${On_IRed}Error: Delete Aborted!${NC}"
 											fi
 										fi
 									;;
 									*)
-										echo -e "Invalid Entry!\nReturning back to Delete Menu"
+										echo -e "${On_IRed}Invalid Entry!${NC}\nReturning back to Delete Menu"
 										sleep 3
 										deleteTable
 									;;
@@ -702,24 +713,24 @@ function deleteTable () {
 									(( selectedCol-- ))
 									if [[ ifString -eq 0 ]]
 									then
-										echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
+										echo -e "${On_IGreen}You choose a String type Column.\n${NC}Please enter the word you want to Delete"
 										read requiredData
 										index=`awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1`
 										indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
 										if [ -z "$index" ]
 										then
-											echo "***Empty Set***"
+											echo -e "${Yellow}***Empty Set***${NC}"
 										else
-											echo -e "Value existing in "$indexlist" records.\n======================="
+											echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 											echo $index
 											read -p "Enter the No. of the line you want to delete from it: " line
 											sed -in "$line s/$requiredData/$blank/" ./${tableName}
 											delDone=$?
 											if [[ delDone -eq 0 ]]
 											then
-												echo "Value Deleted Successfully"
+												echo -e "${On_IGreen}Value Deleted Successfully${NC}"
  											else
-												echo "Error: Delete Aborted!"
+												echo -e "${On_IRed}Error: Delete Aborted!${NC}"
 											fi
 										fi
 									fi	
@@ -730,13 +741,13 @@ function deleteTable () {
 								read cont
 								deleteTable
 							else
-								echo -e "Invalid Column No.!\nReturning back to Delete Menu"
+								echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Delete Menu"
 								sleep 3
 								deleteTable
 							fi
 						;;
 						*)
-							echo -e "Invalid Column No.!\nReturning back to Delete Menu"
+							echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Delete Menu"
 							sleep 3
 							deleteTable
 						;;
@@ -752,7 +763,7 @@ function deleteTable () {
 
 	else
 		
-		echo -e "Invalid table name!\nReturning back to Delete Menu"
+		echo -e "${On_IRed}Invalid table name!${NC}\nReturning back to Delete Menu"
 		sleep 3
 		deleteTable
 	fi
@@ -795,7 +806,7 @@ function updateTable (){
 
 						if [[ ifInt -eq 0 ]]
 						then
-							echo -e "You choose an Integer type Column."
+							echo -e "${On_IGreen}You choose an Integer type Column.{NC}"
 							if [[ ifPK -eq 0 ]]
 							then 
 								echo "This is the PK of the Table"
@@ -804,11 +815,11 @@ function updateTable (){
 								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
 								if [ -z "$index" ]
 								then
-									echo "***Empty Set***"
+									echo -e "${Yellow}***Empty Set***${NC}"
 									sleep 3
 									updateTable
 								else
-									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 									echo $index
 									read -p "Enter the No. of the line you want to Update from it: " line
 									let trueUpdate=0
@@ -821,22 +832,22 @@ function updateTable (){
 										+([0-9]))
 											if [[ ifFound -eq 0 ]]
 											then
-												echo "Error: PK Repetition!"
+												echo -e "${On_IRed}Error: PK Repetition!${NC}"
 											else
 												sed -in "$line s/$requiredData/$newData/" ./${tableName}
 												let upDone=$?
 												if [[ upDone -eq 0 ]]
 												then
-													echo "No. Updated Successfully"
+													echo -e "${On_IGreen}No. Updated Successfully${NC}"
 													((trueUpdate++))
 												else
-													echo "Error: Update Aborted!"
+													echo -e "${On_IRed}Error: Update Aborted!${NC}"
 												fi
 
 											fi
 										;;
 										*)
-										echo -e "Invalid Entry!"
+										echo -e "${On_IRed}Invalid Entry!${NC}"
 										;;
 										esac
 									done
@@ -850,13 +861,13 @@ function updateTable (){
 								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l`
 								if [ -z "$index" ]
 								then
-									echo "***Empty Set***"
+									echo -e "${Yellow}***Empty Set***${NC}"
 									sleep 3
 									updateTable
 								else
-									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 									echo $index
-									read -p "Enter the No. of the line you want to delete from it: " line
+									read -p "Enter the No. of the line you want to Update from it: " line
 									let trueUpdate=0
 									while [[ trueUpdate -eq 0 ]]
 									do
@@ -867,14 +878,14 @@ function updateTable (){
 											let upDone=$?
 											if [[ upDone -eq 0 ]]
 											then
-												echo "No. Updated Successfully"
+												echo -e "${On_IGreen}No. Updated Successfully${NC}"
 												((trueUpdate++))
 											else
-												echo "Error: Update Aborted!"
+												echo -e "${On_IRed}Error: Update Aborted!${NC}"
 											fi
 										;;
 										*)
-										echo -e "Invalid Entry!"
+										echo -e "${On_IRed}Invalid Entry!${NC}"
 										;;
 										esac
 									sleep 3 
@@ -896,13 +907,13 @@ function updateTable (){
 								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
 								if [ -z "$index" ]
 								then
-									echo "***Empty Set***"
+									echo -e "${Yellow}***Empty Set***${NC}"
 									sleep 3
 									updateTable
 								else
-									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 									echo $index
-									read -p "Enter the No. of the line you want to delete from it: " line
+									read -p "Enter the No. of the line you want to Update from it: " line
 									read -p "Enter the new No.: " newData
 									awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $newData
 									let ifFound=$?
@@ -911,16 +922,16 @@ function updateTable (){
 									do
 										if [[ ifFound -eq 0 ]]
 										then
-											echo "Error: PK Repetition!"
+											echo -e "${On_IRed}Error: PK Repetition!${NC}"
 										else
 											sed -in "$line s/$requiredData/$newData/" ./${tableName}
 											let upDone=$?
 											if [[ upDone -eq 0 ]]
 											then
-												echo "No. Updated Successfully"
+												echo -e "${On_IGreen}No. Updated Successfully${NC}"
 												((trueUpdate++))
 											else
-												echo "Error: Update Aborted!"
+												echo -e "${On_IRed}Error: Update Aborted!${NC}"
 											fi
 
 										fi
@@ -932,13 +943,13 @@ function updateTable (){
 								indexlist=`awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l`
 								if [ -z "$index" ]
 								then
-									echo "***Empty Set***"
+									echo -e "${Yellow}***Empty Set***${NC}"
 									sleep 3
 									updateTable
 								else
-									echo -e "Value existing in "$indexlist" records.\n======================="
+									echo -e "${On_IGreen}Value exists in "$indexlist" records.${NC}\n======================="
 									echo $index
-									read -p "Enter the No. of the line you want to delete from it: " line
+									read -p "Enter the No. of the line you want to Update from it: " line
 
 									let trueUpdate=0
 									while [ trueUpdate -eq 0 ]
@@ -947,10 +958,10 @@ function updateTable (){
 										let upDone=$?
 										if [[ upDone -eq 0 ]]
 										then
-											echo "No. Updated Successfully"
+											echo -e "${On_IGreen}No. Updated Successfully${NC}"
 											((trueUpdate++))
 										else
-											echo "Error: Update Aborted!"
+											echo -e "${On_IRed}Error: Update Aborted!${NC}"
 										fi
 
 									done
@@ -959,13 +970,13 @@ function updateTable (){
 						fi
 
 					else
-						echo -e "Invalid Column No.!\nReturning back to Update Menu"
+						echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Update Menu"
 						sleep 3
 						updateTable
 					fi
 				;;
 				*)
-					echo -e "Invalid Column No.!\nReturning back to Update Menu"
+					echo -e "${On_IRed}Invalid Column No.!${NC}\nReturning back to Update Menu"
 					sleep 3
 					updateTable
 				;;
@@ -979,7 +990,7 @@ function updateTable (){
 		done
 	else
 		
-		echo -e "Invalid table name!\nReturning back to Update Menu"
+		echo -e "${On_IRed}Invalid table name!${NC}\nReturning back to Update Menu"
 		sleep 3
 		updateTable
 	fi
