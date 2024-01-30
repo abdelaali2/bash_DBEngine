@@ -10,38 +10,38 @@ function initialization() {
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
 		clear
-		echo -e
+		echo -e "$PROMPT_WELCOME"
 	else
 		clear
-		echo -e "Welcome Back\n\n"
+		echo -e "$PROMPT_WELCOME_BACK"
 	fi
 }
 
 initialization
 
 function mainMenu() {
-	select choice in "$CREATE_DATABASE" "$LIST_DATABASE" "$CONNECT_TO_DATABASE" "$RENAME_DATABASE" "$DELETE_DATABASE" "$EXIT"; do
+	select choice in "$CREATE_DB" "$LIST_DB" "$CONNECT_TO_DB" "$RENAME_DB" "$DELETE_DB" "$EXIT"; do
 		case $choice in
-		"$CREATE_DATABASE")
-			CreateDB
+		"$CREATE_DB")
+			CreateDB || return
 			;;
-		"$LIST_DATABASE")
-			listDatabases
+		"$LIST_DB")
+			listDBs
 			;;
-		"$CONNECT_TO_DATABASE")
+		"$CONNECT_TO_DB")
 			connectToDB
 			;;
-		"$RENAME_DATABASE")
+		"$RENAME_DB")
 			renameDB
 			;;
-		"$DELETE_DATABASE")
+		"$DELETE_DB")
 			deleteDB
 			;;
 		"$EXIT")
 			exit
 			;;
 		*)
-			echo -e "${On_IRed}$INVALID_INPUT${NC}"
+			echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
 			mainMenu
 			;;
 		esac
@@ -49,31 +49,38 @@ function mainMenu() {
 }
 
 function readDBName() {
-	read -re -p "Please Enter database name: " input
+	read -re -p "$PROMPT_READ_DB_NAME" input
 	echo "${input// /_}"
 }
 
 function CreateDB() {
-	dbName=$(replaceSpaces "$(readDBName)")
-	if [[ ${dbName} =~ ^['*'] ]]; then
-		echo "${On_IRed}invalid input!${NC}"
+	dbName=$(readDBName)
+
+	if [[ $dbName == +([a-zA-Z]*) ]]; then
+		dbPath="$RECORDS_DIRECTORY/$dbName"
+
+		if [ -d "$dbPath" ]; then
+			echo -e "${STYLE_ON_IRED}$PROMPT_DB_DUPLICATE_ERROR${STYLE_NC}"
+			return 1
+		fi
+
+		mkdir -p "$dbPath" 2>>/dev/null
+		echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_CREATION_DONE${STYLE_NC}"
+	else
+		clear
+		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
 	fi
 
-	case $dbName in
-	+([a-zA-Z]*))
-		mkdir ./dbms/"${dbName}" 2>>/dev/null
-		if [ $? -eq 0 ]; then
-			echo -e "${On_IGreen}The database is created\n${NC}"
-		else
-			echo -e "${On_IRed}The database already exists\n${NC}"
-		fi
-		;;
-	*)
-		clear
-		echo -e "${On_IRed}Invalid,Database name should not start with a number or a specail character\n${NC}"
+	mainMenu
+}
 
-		;;
-	esac
+function listDBs() {
+	clear
+	for db in "$RECORDS_DIRECTORY"/*/; do
+		if [ -d "$db" ]; then
+			echo -e "$(basename -a "$db")\n"
+		fi
+	done
 
 	mainMenu
 }
@@ -83,30 +90,22 @@ function connectToDB() {
 	dbName=$(readDBName)
 	case $dbName in
 	+([a-zA-Z]*))
-		cd ./dbms/"${dbName}" 2>>/dev/null
+		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null
 		if [ $? -eq 0 ]; then
-			echo -e "${On_IGreen}The Database is selected Successfully\n${NC}"
+			echo -e "${STYLE_ON_IGREEN}The Database is selected Successfully\n${STYLE_NC}"
 			source ${pwd}/.table.sh
 			clear
 		else
-			echo -e "${On_IRed}The database was not found\n${NC}"
+			echo -e "${STYLE_ON_IRED}The database was not found\n${STYLE_NC}"
 			mainMenu
 		fi
 		;;
 	*)
 		clear
-		echo -e "${On_IRed}Invalid name!${NC}"
+		echo -e "${STYLE_ON_IRED}Invalid name!${STYLE_NC}"
 		mainMenu
 		;;
 	esac
-}
-
-function listDatabases() {
-	clear
-	echo -e "List of the databases exist:\n"
-	ls -F ./dbms | grep / 2>>/dev/null
-	echo -e "\n"
-	mainMenu
 }
 
 function renameDB() {
@@ -116,14 +115,14 @@ function renameDB() {
 	+([a-zA-Z]*))
 		mv ./dbms/"${oldDB}" ./dbms/"${newDB}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
-			echo -e "${On_IGreen}Database renamed\n${NC}"
+			echo -e "${STYLE_ON_IGREEN}Database renamed\n${STYLE_NC}"
 		else
-			echo -e "${On_IRed}Database renaming failed\n${NC}"
+			echo -e "${STYLE_ON_IRED}Database renaming failed\n${STYLE_NC}"
 		fi
 		;;
 	*)
 		clear
-		echo -e "${On_IRed}Invalid,database name should not start with a number or a specail character\n${NC}"
+		echo -e "${STYLE_ON_IRED}Invalid,database name should not start with a number or a specail character\n${STYLE_NC}"
 		;;
 	esac
 	mainMenu
@@ -134,15 +133,15 @@ function deleteDB() {
 	clear
 	case $name in
 	+([a-zA-Z]*))
-		echo -e "${Yellow}Are you sure you want to delete database ${name}${NC}"
+		echo -e "${STYLE_YELLOW}Are you sure you want to delete database ${name}${STYLE_NC}"
 		select ch in "Yes" "No"; do
 			case $ch in
 			"Yes")
 				rm -r ./dbms/"${name}" 2>>/dev/null
 				if [ $? -eq 0 ]; then
-					echo -e "${On_IGreen}Database is deleted\n${NC}"
+					echo -e "${STYLE_ON_IGREEN}Database is deleted\n${STYLE_NC}"
 				else
-					echo -e "${On_IRed}Database does not exist\n${NC}"
+					echo -e "${STYLE_ON_IRED}Database does not exist\n${STYLE_NC}"
 				fi
 				break
 				;;
@@ -150,14 +149,14 @@ function deleteDB() {
 				break
 				;;
 			*)
-				echo -e "${On_IRed}Please choose from the options avaliable!${NC}"
+				echo -e "${STYLE_ON_IRED}Please choose from the options avaliable!${STYLE_NC}"
 				;;
 			esac
 		done
 		;;
 	*)
 		clear
-		echo -e "${On_IRed}Invalid input!\n${NC}"
+		echo -e "${STYLE_ON_IRED}Invalid input!\n${NC}"
 		;;
 	esac
 
