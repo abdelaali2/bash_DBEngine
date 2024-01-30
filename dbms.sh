@@ -1,14 +1,14 @@
 #!/bin/bash
 
-initialization() {
+function initialization() {
 	shopt -s extglob
 	export LC_COLLATE=C
 
 	# shellcheck disable=SC1091
 	source constants.sh
 
-	if [ ! -d dbms ]; then
-		mkdir dbms
+	if [ ! -d "$RECORDS_DIRECTORY" ]; then
+		mkdir "$RECORDS_DIRECTORY"
 	fi
 	clear
 }
@@ -37,7 +37,7 @@ function mainMenu() {
 			exit
 			;;
 		*)
-			echo -e "${On_IRed}Invalid Input!\n${NC}"
+			echo -e "${On_IRed}$INVALID_INPUT${NC}"
 			mainMenu
 			;;
 		esac
