@@ -2,18 +2,8 @@
 
 shopt -s extglob
 export LC_COLLATE=C
-# Red='\033[0;31m'
-# Green='\033[0;32m'
-NC='\033[0m'
-Yellow='\033[0;33m'
-On_IGreen='\033[0;102m'
-On_IRed='\033[0;101m'
-CREATE_DATABASE="Create database"
-LIST_DATABASE="List database"
-CONNECT_TO_DATABASE="Connect to a database"
-RENAME_DATABASE="Rename a database"
-DELETE_DATABASE="Delete Database"
-EXIT="Exit"
+
+source ./constants.sh
 
 if [ ! -d dbms ]; then
 	mkdir dbms
