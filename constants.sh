@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=all
 
 NC='\033[0m'
 Yellow='\033[0;33m'
