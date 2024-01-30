@@ -65,7 +65,7 @@ function validator() {
 function CreateDB() {
 	dbName=$(readDBName)
 
-	if [[ $(validator "$dbName") ]]; then
+	if validator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
@@ -98,8 +98,11 @@ function connectToDB() {
 	dbName=$(readDBName)
 	dbPath="$RECORDS_DIRECTORY/$dbName"
 
-	if [[ $(validator "$dbName") ]]; then
-		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null || echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}" && mainMenu
+	if validator "$dbName"; then
+		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null || {
+			echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
+			mainMenu
+		}
 		clear
 		# shellcheck disable=SC1091
 		# shellcheck disable=SC1090
@@ -113,21 +116,23 @@ function connectToDB() {
 
 function renameDB() {
 	oldDB=$(readDBName)
-	newDB=$(readDBName)
-	case $newDB in
-	+([a-zA-Z]*))
-		mv ./dbms/"${oldDB}" ./dbms/"${newDB}" 2>>/dev/null
-		if [ $? -eq 0 ]; then
-			echo -e "${STYLE_ON_IGREEN}Database renamed\n${STYLE_NC}"
+
+	if validator "$oldDB"; then
+		newDB=$(readDBName)
+		if [[ $(validator "$newDB") ]]; then
+			mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB" || {
+				echo -e "${STYLE_ON_IRED}$PROMPT_DB_RENAME_ERROR${STYLE_NC}"
+				return
+			}
+			echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAME_DONE${STYLE_NC}"
 		else
-			echo -e "${STYLE_ON_IRED}Database renaming failed\n${STYLE_NC}"
+			echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_DB_NAME${STYLE_NC}"
 		fi
-		;;
-	*)
+
+	else
 		clear
-		echo -e "${STYLE_ON_IRED}Invalid,database name should not start with a number or a specail character\n${STYLE_NC}"
-		;;
-	esac
+		echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_DB_NAME${STYLE_NC}"
+	fi
 	mainMenu
 }
 

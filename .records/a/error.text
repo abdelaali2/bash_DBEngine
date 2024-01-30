@@ -1,3 +1,0 @@
-./dbms.sh: line 66: cd: ./dbms/a: No such file or directory
-./dbms.sh: line 66: cd: ./dbms/a: No such file or directory
-rm: cannot remove './dbms/3': No such file or directory
