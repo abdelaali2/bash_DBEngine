@@ -9,8 +9,12 @@ function initialization() {
 
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
+		clear
+		echo -e
+	else
+		clear
+		echo -e "Welcome Back\n\n"
 	fi
-	clear
 }
 
 initialization
@@ -44,9 +48,13 @@ function mainMenu() {
 	done
 }
 
+function readDBName() {
+	read -re -p "Please Enter database name: " input
+	echo "${input// /_}"
+}
+
 function CreateDB() {
-	read -e -p "Please Enter database name: " dbName
-	dbName=$(echo ${dbName// /_})
+	dbName=$(replaceSpaces "$(readDBName)")
 	if [[ ${dbName} =~ ^['*'] ]]; then
 		echo "${On_IRed}invalid input!${NC}"
 	fi
@@ -72,8 +80,7 @@ function CreateDB() {
 
 function connectToDB() {
 	pwd=$PWD
-	read -e -p "Please Enter database name: " dbName
-	dbName=$(echo ${dbName// /_})
+	dbName=$(readDBName)
 	case $dbName in
 	+([a-zA-Z]*))
 		cd ./dbms/"${dbName}" 2>>/dev/null
@@ -103,10 +110,8 @@ function listDatabases() {
 }
 
 function renameDB() {
-	read -e -p "Enter current database name: " oldDB
-	read -e -p "Enter the new database name: " newDB
-	newDB=$(echo ${newDB// /_})
-	oldDB=$(echo ${oldDB// /_})
+	oldDB=$(readDBName)
+	newDB=$(readDBName)
 	case $newDB in
 	+([a-zA-Z]*))
 		mv ./dbms/"${oldDB}" ./dbms/"${newDB}" 2>>/dev/null
@@ -125,8 +130,7 @@ function renameDB() {
 }
 
 function deleteDB() {
-	read -e -p "Enter database name: " name
-	name=$(echo ${name// /_})
+	dbName=$(readDBName)
 	clear
 	case $name in
 	+([a-zA-Z]*))
