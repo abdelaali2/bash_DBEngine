@@ -2,40 +2,48 @@
 
 shopt -s extglob
 export LC_COLLATE=C
-Red='\033[0;31m'
-Green='\033[0;32m'
+# Red='\033[0;31m'
+# Green='\033[0;32m'
 NC='\033[0m'
 Yellow='\033[0;33m'
 On_IGreen='\033[0;102m'
 On_IRed='\033[0;101m'
+CREATE_DATABASE="Create database"
+LIST_DATABASE="List database"
+CONNECT_TO_DATABASE="Connect to a database"
+RENAME_DATABASE="Rename a database"
+DELETE_DATABASE="Delete Database"
+EXIT="Exit"
 
-mkdir dbms
+if [ ! -d dbms ]; then
+	mkdir dbms
+fi
 
 clear
 
 function mainMenu() {
-	select choice in "Create Database" "List Databases" "Connect To Databases" "Rename databases" "Delete Database" "Exit"; do
+	select choice in "$CREATE_DATABASE" "$LIST_DATABASE" "$CONNECT_TO_DATABASE" "$RENAME_DATABASE" "$DELETE_DATABASE" "$EXIT"; do
 		case $choice in
-		"Create Database")
+		"$CREATE_DATABASE")
 			CreateDB
 			;;
-		"List Databases")
+		"$LIST_DATABASE")
 			listDatabases
 			;;
-		"Connect To Databases")
+		"$CONNECT_TO_DATABASE")
 			connectToDB
 			;;
-		"Rename databases")
+		"$RENAME_DATABASE")
 			renameDB
 			;;
-		"Delete Database")
+		"$DELETE_DATABASE")
 			deleteDB
 			;;
-		"Exit")
+		"$EXIT")
 			exit
 			;;
 		*)
-			echo -e "${On_IRed}Please choose from the options available!\n${NC}"
+			echo -e "${On_IRed}Invalid Input!\n${NC}"
 			mainMenu
 			;;
 		esac
@@ -50,7 +58,6 @@ function CreateDB() {
 	fi
 
 	case $dbName in
-
 	+([a-zA-Z]*))
 		mkdir ./dbms/"${dbName}" 2>>/dev/null
 		if [ $? -eq 0 ]; then
@@ -65,7 +72,7 @@ function CreateDB() {
 
 		;;
 	esac
-	
+
 	mainMenu
 }
 
