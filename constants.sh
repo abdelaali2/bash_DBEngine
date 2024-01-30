@@ -3,6 +3,7 @@
 
 # Initilization Variables
 RECORDS_DIRECTORY=".records"
+DB_ENGINE="$RECORDS_DIRECTORY/.dbEngine.sh"
 
 # Styling
 STYLE_NC='\033[0m'
@@ -24,4 +25,5 @@ PROMPT_READ_DB_NAME="Enter database name: "
 PROMPT_WELCOME="WELCOME\n\n"
 PROMPT_WELCOME_BACK="WELCOME BACK\n\n"
 PROMPT_DB_CREATION_DONE="Database created successfully\n"
-PROMPT_DB_DUPLICATE_ERROR="The database already exists\n"
+PROMPT_DB_DUPLICATE_ERROR="Database already exists\n"
+PROMPT_DB_NOT_FOUND="Database not found\n"

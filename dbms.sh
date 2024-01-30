@@ -53,10 +53,19 @@ function readDBName() {
 	echo "${input// /_}"
 }
 
+function validator() {
+	local input=$1
+	if [[ $input == +([a-zA-Z]*) ]]; then
+		echo true
+	else
+		echo false
+	fi
+}
+
 function CreateDB() {
 	dbName=$(readDBName)
 
-	if [[ $dbName == +([a-zA-Z]*) ]]; then
+	if [[ $(validator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
@@ -86,26 +95,20 @@ function listDBs() {
 }
 
 function connectToDB() {
-	pwd=$PWD
 	dbName=$(readDBName)
-	case $dbName in
-	+([a-zA-Z]*))
-		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null
-		if [ $? -eq 0 ]; then
-			echo -e "${STYLE_ON_IGREEN}The Database is selected Successfully\n${STYLE_NC}"
-			source ${pwd}/.table.sh
-			clear
-		else
-			echo -e "${STYLE_ON_IRED}The database was not found\n${STYLE_NC}"
-			mainMenu
-		fi
-		;;
-	*)
+	dbPath="$RECORDS_DIRECTORY/$dbName"
+
+	if [[ $(validator "$dbName") ]]; then
+		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null || echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}" && mainMenu
 		clear
-		echo -e "${STYLE_ON_IRED}Invalid name!${STYLE_NC}"
+		# shellcheck disable=SC1091
+		# shellcheck disable=SC1090
+		source "$DB_ENGINE"
+	else
+		clear
+		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
 		mainMenu
-		;;
-	esac
+	fi
 }
 
 function renameDB() {
