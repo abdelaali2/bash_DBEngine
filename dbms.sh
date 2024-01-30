@@ -1,15 +1,19 @@
 #!/bin/bash
 
-shopt -s extglob
-export LC_COLLATE=C
+initialization() {
+	shopt -s extglob
+	export LC_COLLATE=C
 
-source ./constants.sh
+	# shellcheck disable=SC1091
+	source constants.sh
 
-if [ ! -d dbms ]; then
-	mkdir dbms
-fi
+	if [ ! -d dbms ]; then
+		mkdir dbms
+	fi
+	clear
+}
 
-clear
+initialization
 
 function mainMenu() {
 	select choice in "$CREATE_DATABASE" "$LIST_DATABASE" "$CONNECT_TO_DATABASE" "$RENAME_DATABASE" "$DELETE_DATABASE" "$EXIT"; do
