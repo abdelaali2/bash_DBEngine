@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Build Terminal User Interface (TUI) using dialog command
+
 function initialization() {
 	shopt -s extglob
 	export LC_COLLATE=C
@@ -23,7 +25,7 @@ function mainMenu() {
 	select choice in "$CREATE_DB" "$LIST_DB" "$CONNECT_TO_DB" "$RENAME_DB" "$DELETE_DB" "$EXIT"; do
 		case $choice in
 		"$CREATE_DB")
-			CreateDB || return
+			CreateDB
 			;;
 		"$LIST_DB")
 			listDBs
@@ -65,12 +67,12 @@ function validator() {
 function CreateDB() {
 	dbName=$(readDBName)
 
-	if validator "$dbName"; then
+	if [[ $(validator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
 			echo -e "${STYLE_ON_IRED}$PROMPT_DB_DUPLICATE_ERROR${STYLE_NC}"
-			return 1
+			mainMenu
 		fi
 
 		mkdir -p "$dbPath" 2>>/dev/null
@@ -96,9 +98,8 @@ function listDBs() {
 
 function connectToDB() {
 	dbName=$(readDBName)
-	dbPath="$RECORDS_DIRECTORY/$dbName"
 
-	if validator "$dbName"; then
+	if [[ $(validator "$dbName") ]]; then
 		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null || {
 			echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
 			mainMenu
@@ -117,12 +118,12 @@ function connectToDB() {
 function renameDB() {
 	oldDB=$(readDBName)
 
-	if validator "$oldDB"; then
+	if [[ $(validator "$oldDB") ]]; then
 		newDB=$(readDBName)
 		if [[ $(validator "$newDB") ]]; then
 			mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB" || {
 				echo -e "${STYLE_ON_IRED}$PROMPT_DB_RENAME_ERROR${STYLE_NC}"
-				return
+				mainMenu
 			}
 			echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAME_DONE${STYLE_NC}"
 		else
@@ -137,36 +138,34 @@ function renameDB() {
 }
 
 function deleteDB() {
+	listDBs
 	dbName=$(readDBName)
-	clear
-	case $name in
-	+([a-zA-Z]*))
-		echo -e "${STYLE_YELLOW}Are you sure you want to delete database ${name}${STYLE_NC}"
-		select ch in "Yes" "No"; do
+
+	if [[ $(validator "$dbName") ]]; then
+		dbPath="$RECORDS_DIRECTORY/$dbName"
+		echo -e "${STYLE_YELLOW}$dbName $PROMPT_DELETION_CONFIRM${STYLE_NC}"
+		select ch in "$PROMPT_YES_OPTION" "$PROMPT_NO_OPTION"; do
 			case $ch in
-			"Yes")
-				rm -r ./dbms/"${name}" 2>>/dev/null
-				if [ $? -eq 0 ]; then
-					echo -e "${STYLE_ON_IGREEN}Database is deleted\n${STYLE_NC}"
+			"$PROMPT_YES_OPTION")
+				if rm -r "$dbPath" 2>>/dev/null; then
+					echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_DELETION_DONE${STYLE_NC}"
 				else
-					echo -e "${STYLE_ON_IRED}Database does not exist\n${STYLE_NC}"
+					echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
 				fi
-				break
 				;;
-			"No")
-				break
+			"$PROMPT_NO_OPTION")
+				echo -e "${STYLE_YELLOW}$PROMPT_DB_DELETION_CANCELLED${STYLE_NC}"
 				;;
 			*)
-				echo -e "${STYLE_ON_IRED}Please choose from the options avaliable!${STYLE_NC}"
+				echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
 				;;
 			esac
+			mainMenu
 		done
-		;;
-	*)
+	else
 		clear
-		echo -e "${STYLE_ON_IRED}Invalid input!\n${NC}"
-		;;
-	esac
+		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+	fi
 
 	mainMenu
 }
