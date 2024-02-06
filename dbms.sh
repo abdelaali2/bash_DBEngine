@@ -7,7 +7,7 @@ function initialization() {
 	export LC_COLLATE=C
 
 	# shellcheck disable=SC1091
-	source constants.sh
+	source .constants.sh
 
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
@@ -87,27 +87,32 @@ function CreateDB() {
 
 function listDBs() {
 	clear
+	echo -e "$PROMPT_CURRENT_DBS"
 	for db in "$RECORDS_DIRECTORY"/*/; do
 		if [ -d "$db" ]; then
-			echo -e "$(basename -a "$db")\n"
+			echo -e "=> $(basename -a "$db")\n"
 		fi
 	done
-
-	mainMenu
+	if [[ ! $1 ]]; then
+		mainMenu
+	fi
 }
 
 function connectToDB() {
+	listDBs "skipMainMenu"
 	dbName=$(readDBName)
 
 	if [[ $(validator "$dbName") ]]; then
-		cd "$RECORDS_DIRECTORY/$dbName" 2>>/dev/null || {
+		dbPath="$RECORDS_DIRECTORY/$dbName"
+
+		if [[ -d "$dbPath" ]]; then
+			clear
+			# shellcheck disable=SC1091
+			# shellcheck disable=SC1090
+			source "$DB_ENGINE" "$dbPath"
+		else
 			echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
-			mainMenu
-		}
-		clear
-		# shellcheck disable=SC1091
-		# shellcheck disable=SC1090
-		source "$DB_ENGINE"
+		fi
 	else
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
@@ -116,16 +121,17 @@ function connectToDB() {
 }
 
 function renameDB() {
+	listDBs "skipMainMenu"
 	oldDB=$(readDBName)
 
 	if [[ $(validator "$oldDB") ]]; then
 		newDB=$(readDBName)
 		if [[ $(validator "$newDB") ]]; then
-			mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB" || {
-				echo -e "${STYLE_ON_IRED}$PROMPT_DB_RENAME_ERROR${STYLE_NC}"
-				mainMenu
-			}
-			echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAME_DONE${STYLE_NC}"
+			if "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
+				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAMING_DONE${STYLE_NC}"
+			else
+				echo -e "${STYLE_ON_IRED}$PROMPT_DB_RENAMING_ERROR${STYLE_NC}"
+			fi
 		else
 			echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_DB_NAME${STYLE_NC}"
 		fi
@@ -138,7 +144,7 @@ function renameDB() {
 }
 
 function deleteDB() {
-	listDBs
+	listDBs "skipMainMenu"
 	dbName=$(readDBName)
 
 	if [[ $(validator "$dbName") ]]; then
