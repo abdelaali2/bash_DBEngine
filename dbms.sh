@@ -8,6 +8,8 @@ function initialization() {
 
 	# shellcheck disable=SC1091
 	source .constants.sh
+	# shellcheck disable=SC1091
+	source .utilities.sh
 
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
@@ -50,22 +52,8 @@ function mainMenu() {
 	done
 }
 
-function readDBName() {
-	read -re -p "$PROMPT_READ_DB_NAME" input
-	echo "${input// /_}"
-}
-
-function validator() {
-	local input=$1
-	if [[ $input == +([a-zA-Z]*) ]]; then
-		echo true
-	else
-		echo false
-	fi
-}
-
 function CreateDB() {
-	dbName=$(readDBName)
+	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
 	if [[ $(validator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
@@ -100,7 +88,7 @@ function listDBs() {
 
 function connectToDB() {
 	listDBs "skipMainMenu"
-	dbName=$(readDBName)
+	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
 	if [[ $(validator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
@@ -122,10 +110,10 @@ function connectToDB() {
 
 function renameDB() {
 	listDBs "skipMainMenu"
-	oldDB=$(readDBName)
+	oldDB=$(readInput "$PROMPT_READ_DB_NAME")
 
 	if [[ $(validator "$oldDB") ]]; then
-		newDB=$(readDBName)
+		newDB=$(readInput "$PROMPT_READ_DB_NAME")
 		if [[ $(validator "$newDB") ]]; then
 			if "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
 				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAMING_DONE${STYLE_NC}"
@@ -145,7 +133,7 @@ function renameDB() {
 
 function deleteDB() {
 	listDBs "skipMainMenu"
-	dbName=$(readDBName)
+	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
 	if [[ $(validator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
