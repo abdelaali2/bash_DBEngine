@@ -136,25 +136,26 @@ function deleteDB() {
 
 	if [[ $(textValidator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
-		echo -e "${STYLE_YELLOW}$dbName $PROMPT_DELETION_CONFIRM${STYLE_NC}"
-		select ch in "$PROMPT_YES_OPTION" "$PROMPT_NO_OPTION"; do
-			case $ch in
-			"$PROMPT_YES_OPTION")
-				if rm -r "$dbPath" 2>>/dev/null; then
-					echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_DELETION_DONE${STYLE_NC}"
-				else
-					echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
-				fi
-				;;
-			"$PROMPT_NO_OPTION")
-				echo -e "${STYLE_YELLOW}$PROMPT_DB_DELETION_CANCELLED${STYLE_NC}"
-				;;
-			*)
-				echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
-				;;
-			esac
-			mainMenu
-		done
+
+		confirmChoice "$dbName $PROMPT_DELETION_CONFIRM"
+		choice=$?
+
+		case "${choice}" in
+		0)
+			if rm -r "$dbPath" 2>>/dev/null; then
+				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_DELETION_DONE${STYLE_NC}"
+			else
+				echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
+			fi
+			;;
+		1)
+			echo -e "${STYLE_YELLOW}$PROMPT_DB_DELETION_CANCELLED${STYLE_NC}"
+			;;
+		*)
+			echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
+			;;
+		esac
+
 	else
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
