@@ -55,7 +55,7 @@ function mainMenu() {
 function CreateDB() {
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if [[ $(validator "$dbName") ]]; then
+	if [[ $(textValidator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
@@ -69,7 +69,6 @@ function CreateDB() {
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
 	fi
-
 	mainMenu
 }
 
@@ -90,7 +89,7 @@ function connectToDB() {
 	listDBs "skipMainMenu"
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if [[ $(validator "$dbName") ]]; then
+	if [[ $(textValidator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [[ -d "$dbPath" ]]; then
@@ -104,17 +103,17 @@ function connectToDB() {
 	else
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
-		mainMenu
 	fi
+	mainMenu
 }
 
 function renameDB() {
 	listDBs "skipMainMenu"
 	oldDB=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if [[ $(validator "$oldDB") ]]; then
+	if [[ $(textValidator "$oldDB") ]]; then
 		newDB=$(readInput "$PROMPT_READ_DB_NAME")
-		if [[ $(validator "$newDB") ]]; then
+		if [[ $(textValidator "$newDB") ]]; then
 			if "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
 				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAMING_DONE${STYLE_NC}"
 			else
@@ -135,7 +134,7 @@ function deleteDB() {
 	listDBs "skipMainMenu"
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if [[ $(validator "$dbName") ]]; then
+	if [[ $(textValidator "$dbName") ]]; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 		echo -e "${STYLE_YELLOW}$dbName $PROMPT_DELETION_CONFIRM${STYLE_NC}"
 		select ch in "$PROMPT_YES_OPTION" "$PROMPT_NO_OPTION"; do
