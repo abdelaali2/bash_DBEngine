@@ -6,19 +6,19 @@ function readInput() {
 
 function textValidator() {
     local input=$1
-    if [[ $input == ^[a-zA-Z][a-zA-Z0-9]*$ ]]; then
-        reutrn 0
+    if [[ $input =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]]; then
+        return 0
     else
-        reutrn 1
+        return 1
     fi
 }
 
 function numberValidator() {
     local input=$1
     if [[ $input == +([1-9]) ]]; then
-        reutrn 0
+        return 0
     else
-        reutrn 1
+        return 1
     fi
 }
 
