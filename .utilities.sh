@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 function readInput() {
-    read -re -p "$1" input
+    read -rep "$1" input
     echo "${input// /_}"
 }
 
@@ -24,22 +24,14 @@ function numberValidator() {
 
 function confirmChoice() {
     echo -e "${STYLE_YELLOW}$1${STYLE_NC}"
-    select ch in "$PROMPT_YES_OPTION" "$PROMPT_NO_OPTION"; do
-        case $ch in
-        "$PROMPT_YES_OPTION")
-            return 0
-            ;;
-        "$PROMPT_NO_OPTION")
-            return 1
-            ;;
-        [Yy]*)
-            return 0
-            ;;
-        [Nn]*)
-            return 1
-            ;;
+    while true; do
+        read -ren 1 answer
+        case "$answer" in
+        [Yy]*) return 0 ;;
+        [Nn]*) return 1 ;;
         *)
-            return 2
+            echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+            echo "Enter '$PROMPT_YES_OPTION' or '$PROMPT_NO_OPTION'."
             ;;
         esac
     done

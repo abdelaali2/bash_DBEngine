@@ -137,25 +137,15 @@ function deleteDB() {
 	if textValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
-		confirmChoice "$dbName $PROMPT_DELETION_CONFIRM"
-		choice=$?
-
-		case "${choice}" in
-		0)
+		if confirmChoice "$dbName $PROMPT_DELETION_CONFIRM"; then
 			if rm -r "$dbPath" 2>>/dev/null; then
 				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_DELETION_DONE${STYLE_NC}"
 			else
-				echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
+				echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
 			fi
-			;;
-		1)
+		else
 			echo -e "${STYLE_YELLOW}$PROMPT_DB_DELETION_CANCELLED${STYLE_NC}"
-			;;
-		*)
-			echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
-			;;
-		esac
-
+		fi
 	else
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
