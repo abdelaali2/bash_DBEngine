@@ -23,16 +23,33 @@ function numberValidator() {
 }
 
 function confirmChoice() {
-    echo -e "${STYLE_YELLOW}$1${STYLE_NC}"
+    printWarning "$1"
     while true; do
         read -ren 1 answer
         case "$answer" in
         [Yy]*) return 0 ;;
         [Nn]*) return 1 ;;
         *)
-            echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+            printError "$PROMPT_INVALID_INPUT"
             echo "Enter '$PROMPT_YES_OPTION' or '$PROMPT_NO_OPTION'."
             ;;
         esac
     done
+}
+
+function printError() {
+    echo -e "${STYLE_ON_IRED}$1${STYLE_NC}"
+}
+
+function printSuccess() {
+    echo -e "${STYLE_ON_IGREEN}$1${STYLE_NC}"
+}
+
+function printWarning() {
+    echo -e "${STYLE_YELLOW}$1${STYLE_NC}"
+}
+
+function printListItem() {
+    echo -e "==>  $1\n"
+
 }

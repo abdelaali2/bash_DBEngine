@@ -45,7 +45,7 @@ function mainMenu() {
 			exit
 			;;
 		*)
-			echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+			printError "$PROMPT_INVALID_INPUT"
 			mainMenu
 			;;
 		esac
@@ -59,15 +59,15 @@ function CreateDB() {
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
-			echo -e "${STYLE_ON_IRED}$PROMPT_DB_DUPLICATE_ERROR${STYLE_NC}"
+			printError "$PROMPT_DB_DUPLICATE_ERROR"
 			mainMenu
 		fi
 
 		mkdir -p "$dbPath" 2>>/dev/null
-		echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_CREATION_DONE${STYLE_NC}"
+		printSuccess "$PROMPT_DB_CREATION_DONE"
 	else
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+		printError "$PROMPT_INVALID_INPUT"
 	fi
 	mainMenu
 }
@@ -77,7 +77,7 @@ function listDBs() {
 	echo -e "$PROMPT_CURRENT_DBS"
 	for db in "$RECORDS_DIRECTORY"/*/; do
 		if [ -d "$db" ]; then
-			echo -e "=> $(basename -a "$db")\n"
+			printListItem "$(basename -a "$db")"
 		fi
 	done
 	if [[ ! $1 ]]; then
@@ -98,11 +98,11 @@ function connectToDB() {
 			# shellcheck disable=SC1090
 			source "$DB_ENGINE" "$dbPath"
 		else
-			echo -e "${STYLE_ON_IRED}$PROMPT_DB_NOT_FOUND${STYLE_NC}"
+			printError "$PROMPT_DB_NOT_FOUND"
 		fi
 	else
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+		printError "$PROMPT_INVALID_INPUT"
 	fi
 	mainMenu
 }
@@ -115,17 +115,17 @@ function renameDB() {
 		newDB=$(readInput "$PROMPT_READ_NEW_DB_NAME")
 		if textValidator "$newDB"; then
 			if mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
-				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_RENAMING_DONE${STYLE_NC}"
+				printSuccess "$PROMPT_DB_RENAMING_DONE"
 			else
-				echo -e "${STYLE_ON_IRED}$PROMPT_DB_RENAMING_ERROR${STYLE_NC}"
+				printError "$PROMPT_DB_RENAMING_ERROR"
 			fi
 		else
-			echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_DB_NAME${STYLE_NC}"
+			printError "$PROMPT_INAVLID_DB_NAME"
 		fi
 
 	else
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_DB_NAME${STYLE_NC}"
+		printError "$PROMPT_INAVLID_DB_NAME"
 	fi
 	mainMenu
 }
@@ -137,18 +137,18 @@ function deleteDB() {
 	if textValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
-		if confirmChoice "$dbName $PROMPT_DELETION_CONFIRM"; then
+		if confirmChoice "$dbName: $PROMPT_DELETION_CONFIRM"; then
 			if rm -r "$dbPath" 2>>/dev/null; then
-				echo -e "${STYLE_ON_IGREEN}$PROMPT_DB_DELETION_DONE${STYLE_NC}"
+				printSuccess "$PROMPT_DB_DELETION_DONE"
 			else
-				echo -e "${STYLE_ON_IRED}$PROMPT_DB_DELETION_ERROR${STYLE_NC}"
+				printError "$PROMPT_DB_DELETION_ERROR"
 			fi
 		else
-			echo -e "${STYLE_YELLOW}$PROMPT_DB_DELETION_CANCELLED${STYLE_NC}"
+			printWarning "$PROMPT_DB_DELETION_CANCELLED"
 		fi
 	else
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+		printError "$PROMPT_INVALID_INPUT"
 	fi
 
 	mainMenu

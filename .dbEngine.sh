@@ -37,7 +37,7 @@ function tableMenu() {
 			mainMenu
 			;;
 		*)
-			echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+			printError "$PROMPT_INVALID_INPUT"
 			tableMenu
 			;;
 		esac
@@ -56,7 +56,7 @@ function readTableName() {
 
 	while ! textValidator "$tableName"; do
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_TABLE_NAME${STYLE_NC}"
+		printError "$PROMPT_INAVLID_TABLE_NAME"
 		tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
 	done
 }
@@ -66,7 +66,7 @@ function readNumOfColumns() {
 
 	while ! numberValidator "$numOfColumns"; do
 		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+		printError "$PROMPT_INVALID_INPUT"
 		numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
 	done
 }
@@ -106,7 +106,7 @@ function readColumnName() {
 
 	while ! textValidator "$columnName"; do
 		local error
-		error=$(echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}")
+		error=$(printError "$PROMPT_INVALID_INPUT")
 		unset "$error"
 		columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
 	done
@@ -116,7 +116,6 @@ function readColumnName() {
 }
 
 function readColumnType() {
-	# Masking the output of this echo command so it doesn't affect the return of the finction.
 	local header
 	header=$(echo -e "$PROMPT_READ_COL_TYPE $1")
 	unset "$header"
@@ -130,7 +129,7 @@ function readColumnType() {
 			;;
 		*)
 			local error
-			error=$(echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}")
+			error=$(printError "$PROMPT_INVALID_INPUT")
 			unset "$error"
 			;;
 		esac
@@ -153,9 +152,9 @@ function writeToFiles() {
 	metaTablePath="$currentDB/.${tableName}-meta"
 
 	if echo -e "$meta" >"$metaTablePath" && echo -e "$header" >"$tablePath"; then
-		echo -e "${STYLE_ON_IGREEN}$PROMPT_TABLE_CREATION_DONE${STYLE_NC}"
+		printSuccess "$PROMPT_TABLE_CREATION_DONE"
 	else
-		echo -e "${STYLE_ON_IRED}$PROMPT_TABLE_CREATION_ERROR${STYLE_NC}"
+		printError "$PROMPT_TABLE_CREATION_ERROR"
 
 	fi
 }
