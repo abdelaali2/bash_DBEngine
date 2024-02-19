@@ -162,7 +162,11 @@ function writeToFiles() {
 function listTables() {
 	clear
 	echo -e "$PROMPT_CURRENT_TABLES"
-	ls "$currentDB" 2>>/dev/null
+	for table in "$currentDB"/*; do
+		if [ -f "$table" ]; then
+			printListItem "$(basename -a "$table")"
+		fi
+	done
 	tableMenu
 }
 
