@@ -34,7 +34,6 @@ function tableMenu() {
 
 		"$RETURN")
 			clear
-			cd ../..
 			mainMenu
 			;;
 		*)
@@ -47,109 +46,118 @@ function tableMenu() {
 }
 
 function createTable() {
-	#asking for table name
+	readTableName
+	readNumOfColumns
+	tableCreator
+}
 
+function readTableName() {
 	tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
 
-	if [[ $(validator "$tableName") ]]; then
-		colNumber=$(readInput "$PROMPT_READ_COL_NUMBER")
-		case ${colNumber} in
-		+([1-9]))
-			counter=1
-			sep=":"
-			newLine="\n"
-			primaryKey=""
-			metaData="Field"$sep"Type"$sep"key"
-			while [ ${counter} -le ${colNumber} ]; do
-				#asking for the name of the column
-				read -p "Please enter the name of column no.${counter}: " columnName
-				columnName=$(echo ${columnName// /_})
-				case "${columnName}" in
-				+([a-zA-Z]*))
-					#asking for the type of the column
-					echo "choose type of column ${columnName}"
-					select ch in "integer" "string"; do
-						case $ch in
-						"integer")
-							colType="int"
-							break
-							;;
-						"string")
-							colType="string"
-							break
-							;;
-						*)
-							echo "Invalid choice! Please choose from the options available"
-							;;
-						esac
-					done
-					;;
-				*)
-					echo "Invalid name"
-					createTable
-					break
-					;;
-				esac
-
-				#asking for pk
-				if [ -z ${primaryKey} ]; then
-					echo -e "Do you want this column to be the pk?"
-					select ch in "Yes" "No"; do
-						case $ch in
-						"Yes")
-							primaryKey="PK"
-							metaData+=$newLine$columnName$sep$colType$sep$primaryKey
-							break
-							;;
-						"No")
-							metaData+=$newLine$columnName$sep$colType$sep""
-							break
-							;;
-						*)
-							echo "Invalid choice! Please choose from the options available"
-							;;
-						esac
-					done
-				else
-					metaData+=$newLine$columnName$sep$colType$sep""
-
-				fi
-
-				if [ $counter -eq $colNumber ]; then
-					tableHeader=$tableHeader$columnName
-				else
-					tableHeader=$tableHeader$columnName$sep
-				fi
-
-				((counter++))
-
-			done #end of while
-
-			touch ".${tableName}_metaData"
-			touch "${tableName}"
-			echo -e $metaData >>".${tableName}_metaData"
-			echo -e $tableHeader >>${tableName}
-			if [ $? -eq 0 ]; then
-				echo "Table Created Successfully"
-				tableMenu
-			else
-				echo "Error Creating Table $tableName"
-				tableMenu
-			fi
-			;;
-		*)
-			clear
-			echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
-			createTable
-			;;
-		esac
-	else
+	while ! textValidator "$tableName"; do
 		clear
 		echo -e "${STYLE_ON_IRED}$PROMPT_INAVLID_TABLE_NAME${STYLE_NC}"
+		tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
+	done
+}
 
-		createTable
+function readNumOfColumns() {
+	numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
+
+	while ! numberValidator "$numOfColumns"; do
+		clear
+		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
+		numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
+	done
+}
+
+function tableCreator() {
+	isPrimaryKey=false
+	metaData=$DATA_HEADER
+	tableHeader=""
+
+	for counter in $(seq "$numOfColumns"); do
+		columnName=$(readColumnName "$counter")
+		columnType=$(readColumnType "$columnName")
+
+		if [[ $isPrimaryKey == false ]]; then
+			if confirmPKAssignment; then
+				metaData+=$columnName$DATA_SEPARATOR$columnType${DATA_SEPARATOR}true
+				isPrimaryKey=true
+			fi
+		else
+			metaData+=$columnName$DATA_SEPARATOR$columnType${DATA_SEPARATOR}false
+		fi
+
+		if [ "$counter" -le "$numOfColumns" ]; then
+			metaData+=$DATA_NEW_LINE
+			tableHeader+=$DATA_SEPARATOR
+		fi
+	done
+
+	writeToFiles "$metaData" "$tableHeader"
+
+	tableMenu
+}
+
+function readColumnName() {
+	local counter=$1
+	columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
+
+	while ! textValidator "$columnName"; do
+		local error
+		error=$(echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}")
+		unset "$error"
+		columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
+	done
+
+	echo "$columnName"
+
+}
+
+function readColumnType() {
+	# Masking the output of this echo command so it doesn't affect the return of the finction.
+	local header
+	header=$(echo -e "$PROMPT_READ_COL_TYPE $1")
+	unset "$header"
+
+	local type
+	select ch in "$DATA_INTEGER" "$DATA_STRING"; do
+		case $ch in
+		"$DATA_INTEGER" | "$DATA_STRING")
+			type="$ch"
+			break
+			;;
+		*)
+			local error
+			error=$(echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}")
+			unset "$error"
+			;;
+		esac
+	done
+	echo "$type"
+}
+
+function confirmPKAssignment() {
+	if confirmChoice "$PROMPT_ASSIGN_AS_PK"; then
+		return 0
 	fi
+	return 1
+}
 
+function writeToFiles() {
+	local meta=$1
+	local header=$2
+
+	tablePath="$currentDB/$tableName"
+	metaTablePath="$currentDB/.${tableName}-meta"
+
+	if echo -e "$meta" >"$metaTablePath" && echo -e "$header" >"$tablePath"; then
+		echo -e "${STYLE_ON_IGREEN}$PROMPT_TABLE_CREATION_DONE${STYLE_NC}"
+	else
+		echo -e "${STYLE_ON_IRED}$PROMPT_TABLE_CREATION_ERROR${STYLE_NC}"
+
+	fi
 }
 
 function listTables() {
@@ -206,8 +214,8 @@ function insert() {
 	esac
 
 	numberOfColumns=$(awk 'END{print NR}' ".${tableName}_metaData")
-	sep=":"
-	newLine="\n"
+	DATA_SEPARATOR=":"
+	DATA_NEW_LINE="\n"
 	for ((i = 2; i <= ${numberOfColumns}; i++)); do
 		#loop 3ala el meta data we b3mlohm store fe var 3shan a3ml check lama el user y3ml insert
 		columnName=$(awk 'BEGIN{FS=":"}{ if(NR == '${i}') print $1}' ".${tableName}_metaData")
@@ -234,9 +242,9 @@ function insert() {
 		fi
 
 		if [ ${i} -eq ${numberOfColumns} ]; then
-			row=$row$data$newLine
+			row=$row$data$DATA_NEW_LINE
 		else
-			row=$row$data$sep
+			row=$row$data$DATA_SEPARATOR
 		fi
 
 	done
