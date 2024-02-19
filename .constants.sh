@@ -27,6 +27,9 @@ export INSERT_INTO_TABLE="Insert into table"
 export SELECT_FROM_TABLE="Select from table"
 export DELETE_FROM_TABLE="Delete from table"
 
+# Table Menu Scripts
+export SCRIPT_CREATE_TABLE=".createTable.sh"
+
 # General Select Options
 export EXIT="Exit"
 export RETURN="Return"
