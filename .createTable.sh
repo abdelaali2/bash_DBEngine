@@ -2,16 +2,6 @@
 
 DBinAction=$1
 
-function readTableName() {
-    tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
-
-    while ! textValidator "$tableName"; do
-        clear
-        printError "$PROMPT_INAVLID_TABLE_NAME"
-        tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
-    done
-}
-
 function readNumOfColumns() {
     numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
 
@@ -42,7 +32,7 @@ function tableCreator() {
 
         if [ "$counter" -le "$numOfColumns" ]; then
             metaData+=$DATA_NEW_LINE
-            tableHeader+=$DATA_SEPARATOR
+            tableHeader+=$columnName$DATA_SEPARATOR
         fi
     done
 
@@ -67,9 +57,9 @@ function readColumnName() {
 }
 
 function readColumnType() {
-    local header
-    header=$(echo -e "$PROMPT_READ_COL_TYPE $1")
-    unset "$header"
+    local readColHeader
+    readColHeader=$(echo -e "$PROMPT_READ_COL_TYPE $1")
+    unset "$readColHeader"
 
     local type
     select ch in "$DATA_INTEGER" "$DATA_STRING"; do
@@ -110,6 +100,6 @@ function writeToFiles() {
     fi
 }
 
-readTableName
+tableName=$(readTableName)
 readNumOfColumns
 tableCreator

@@ -51,5 +51,15 @@ function printWarning() {
 
 function printListItem() {
     echo -e "==>  $1\n"
+}
 
+function readTableName() {
+    tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
+
+    while ! textValidator "$tableName"; do
+        clear
+        printError "$PROMPT_INAVLID_TABLE_NAME"
+        tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
+    done
+    echo "$tableName"
 }
