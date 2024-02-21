@@ -55,40 +55,31 @@ function listTables() {
 			printListItem "$(basename -a "$table")"
 		fi
 	done
-	tableMenu
+	if [[ ! $1 ]]; then
+		tableMenu
+	fi
 }
 
 function dropTable() {
-	tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
-	case $tableName in
-	+([a-zA-Z]*))
-		echo -e "${STYLE_ON_IYELLOW}Are you sure you want to delete table ${tableName}${STYLE_NC}"
-		select ch in "Yes" "No"; do
-			case $ch in
-			"Yes")
-				rm "${tableName}" 2>>/dev/null
-				if [ $? -eq 0 ]; then
-					echo -e "Table is dropped\n"
-					rm "${tableName}_metaData" 2>>/dev/null
-				else
-					echo -e "Error dropping the table\n"
-				fi
-				break
-				;;
-			"No")
-				break
-				;;
-			*)
-				echo "Please choose from the options avaliable!"
-				;;
-			esac
-		done
-		;;
-	*)
-		clear
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
-		;;
-	esac
+	listTables "skipTableMenu"
+	tableName=$(readTableName "$PROMPT_READ_TABLE_NAME")
+
+	if textValidator "$tableName"; then
+		tablePath="./$currentDB/$tableName"
+		metaTablePath="./$currentDB/.$tableName-meta"
+		if confirmChoice "$tableName: $PROPMPT_TABLE_DELETEION_CONFIRM"; then
+			if rm -r "$tablePath" "$metaTablePath" 2>/dev/null; then
+				printSuccess "$PROMPT_TABLE_DELETION_DONE"
+			else
+				printError "$PROMPT_TABLE_DELETION_ERROR"
+			fi
+		else
+			printWarning "$PROMPT_TABLE_DELETION_CANCELLED"
+		fi
+	else
+		printError "$PROMPT_INVALID_INPUT"
+	fi
+	echo "$tableName"
 	tableMenu
 }
 
