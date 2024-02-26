@@ -15,7 +15,9 @@ function tableMenu() {
 			source "$SCRIPT_LIST_TABLES" "$currentDB"
 			;;
 		"$DROP_TABLE")
-			dropTable
+			# shellcheck disable=SC1091
+			# shellcheck disable=SC1090
+			source "$SCRITPT_DROP_TABLE" "$currentDB"
 			;;
 		"$INSERT_INTO_TABLE")
 			insert
@@ -47,31 +49,6 @@ function tableMenu() {
 		esac
 	done
 
-}
-
-function dropTable() {
-	# shellcheck disable=SC1091
-	# shellcheck disable=SC1090
-	source "$SCRIPT_LIST_TABLES" "$currentDB" "skipTableMenu"
-	tableName=$(readTableName "$PROMPT_READ_TABLE_NAME")
-
-	if textValidator "$tableName"; then
-		tablePath="./$currentDB/$tableName"
-		metaTablePath="./$currentDB/.$tableName-meta"
-		if confirmChoice "  $tableName:\n\t $PROPMPT_TABLE_DELETEION_CONFIRM"; then
-			if rm -r "$tablePath" "$metaTablePath" 2>/dev/null; then
-				printSuccess "$PROMPT_TABLE_DELETION_DONE"
-			else
-				printError "$PROMPT_TABLE_DELETION_ERROR"
-			fi
-		else
-			printWarning "$PROMPT_TABLE_DELETION_CANCELLED"
-		fi
-	else
-		printError "$PROMPT_INVALID_INPUT"
-	fi
-	echo "$tableName"
-	tableMenu
 }
 
 function insert() {

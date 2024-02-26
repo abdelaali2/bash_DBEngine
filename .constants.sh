@@ -30,6 +30,7 @@ export DELETE_FROM_TABLE="Delete from table"
 # Table Menu Scripts
 export SCRIPT_CREATE_TABLE=".createTable.sh"
 export SCRIPT_LIST_TABLES=".listTables.sh"
+export SCRITPT_DROP_TABLE=".dropTable.sh"
 
 # General Select Options
 export EXIT="Exit"
