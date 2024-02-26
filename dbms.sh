@@ -14,10 +14,10 @@ function initialization() {
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
 		clear
-		echo -e "$PROMPT_WELCOME"
+		printGreeting "$PROMPT_WELCOME"
 	else
 		clear
-		echo -e "$PROMPT_WELCOME_BACK"
+		printGreeting "$PROMPT_WELCOME_BACK"
 	fi
 }
 

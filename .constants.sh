@@ -7,9 +7,9 @@ export RECORDS_DIRECTORY=".records"
 # Styling
 export STYLE_NC='\033[0m'
 export STYLE_YELLOW='\033[0;33m'
-export STYLE_ON_IRED='\033[0;101m'
-export STYLE_ON_IGREEN='\033[0;102m'
-export STYLE_ON_IYELLOW='\033[0;103m'
+export STYLE_ON_IRED='\033[0;41m'
+export STYLE_ON_ICYAN='\033[0;46m'
+export STYLE_ON_IGREEN='\033[0;42m'
 
 # Main Menu Select Options
 export LIST_DB="List databases"

@@ -53,6 +53,10 @@ function printListItem() {
     echo -e "==>  $1\n"
 }
 
+function printGreeting() {
+    echo -e "${STYLE_ON_ICYAN}$1${STYLE_NC}"
+}
+
 function readTableName() {
     tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
 

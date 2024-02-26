@@ -67,7 +67,7 @@ function dropTable() {
 	if textValidator "$tableName"; then
 		tablePath="./$currentDB/$tableName"
 		metaTablePath="./$currentDB/.$tableName-meta"
-		if confirmChoice "$tableName: $PROPMPT_TABLE_DELETEION_CONFIRM"; then
+		if confirmChoice "  $tableName:\n\t $PROPMPT_TABLE_DELETEION_CONFIRM"; then
 			if rm -r "$tablePath" "$metaTablePath" 2>/dev/null; then
 				printSuccess "$PROMPT_TABLE_DELETION_DONE"
 			else
