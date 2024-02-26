@@ -30,7 +30,7 @@ function tableCreator() {
             metaData+=$columnName$DATA_SEPARATOR$columnType${DATA_SEPARATOR}false
         fi
 
-        if [ "$counter" -le "$numOfColumns" ]; then
+        if [ "$counter" -lt "$numOfColumns" ]; then
             metaData+=$DATA_NEW_LINE
             tableHeader+=$columnName$DATA_SEPARATOR
         fi
@@ -90,7 +90,7 @@ function writeToFiles() {
     local header=$2
 
     tablePath="$DBinAction/$tableName"
-    metaTablePath="$DBinAction/.${tableName}-meta"
+    metaTablePath="$DBinAction/.${tableName}.meta"
 
     if echo -e "$meta" >"$metaTablePath" && echo -e "$header" >"$tablePath"; then
         printSuccess "$PROMPT_TABLE_CREATION_DONE"
