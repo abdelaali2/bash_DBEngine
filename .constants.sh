@@ -74,7 +74,7 @@ export PROMPT_TABLE_DELETION_ERROR="Error: Unable to drop the table\n"
 export PROMPT_TABLE_NOT_FOUND="Error: Table not found\n"
 
 # Data Constants
-export DATA_SEPARATOR="\t:\t"
+export DATA_SEPARATOR=":"
 export DATA_NEW_LINE="\n"
 export DATA_HEADER="Field${DATA_SEPARATOR}Type${DATA_SEPARATOR}PK${DATA_NEW_LINE}"
 export DATA_INTEGER="Integer"
