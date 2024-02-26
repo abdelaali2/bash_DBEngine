@@ -65,6 +65,7 @@ function printGreeting() {
 function readTableName() {
     tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
 
+    # TODO: replace while ! with until
     while ! nameValidator "$tableName"; do
         clear
         printError "$PROMPT_INVALID_NAME"
