@@ -5,17 +5,17 @@ function readInput() {
 }
 
 function textValidator() {
-    local input=$1
-    if [[ $input =~ ^[a-zA-Z][a-zA-Z0-9]*$ ]]; then
-        return 0
-    else
-        return 1
-    fi
+    regexChecker "$1" "$REGEX_NAMES"
+    return $?
 }
 
 function numberValidator() {
-    local input=$1
-    if [[ $input == +([1-9]) ]]; then
+    regexChecker "$1" "$REGEX_NUMERIC"
+    return $?
+}
+
+function regexChecker() {
+    if [[ $1 =~ $2 ]]; then
         return 0
     else
         return 1

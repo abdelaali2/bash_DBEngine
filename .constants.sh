@@ -79,3 +79,7 @@ export DATA_NEW_LINE="\n"
 export DATA_HEADER="Field${DATA_SEPARATOR}Type${DATA_SEPARATOR}PK${DATA_NEW_LINE}"
 export DATA_INTEGER="Integer"
 export DATA_STRING="String"
+
+# REGEXP Constants
+export REGEX_NUMERIC="^([1-9][0-9]*)$"
+export REGEX_NAMES="^[a-zA-Z][a-zA-Z0-9]*$"
