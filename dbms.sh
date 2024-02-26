@@ -137,7 +137,7 @@ function deleteDB() {
 	if textValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
-		if confirmChoice "$dbName: $PROMPT_DELETION_CONFIRM"; then
+		if confirmChoice "$dbName:\n\t $PROMPT_DELETION_CONFIRM"; then
 			if rm -r "$dbPath" 2>>/dev/null; then
 				printSuccess "$PROMPT_DB_DELETION_DONE"
 			else
