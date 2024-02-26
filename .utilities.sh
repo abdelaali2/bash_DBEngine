@@ -62,7 +62,7 @@ function readTableName() {
 
     while ! textValidator "$tableName"; do
         clear
-        printError "$PROMPT_INAVLID_TABLE_NAME"
+        printError "$PROMPT_INVALID_NAME"
         tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
     done
     echo "$tableName"

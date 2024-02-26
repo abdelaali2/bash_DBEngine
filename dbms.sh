@@ -98,7 +98,7 @@ function connectToDB() {
 			# shellcheck disable=SC1090
 			source "$DB_ENGINE" "$dbPath"
 		else
-			printError "$PROMPT_DB_NOT_FOUND"
+			printError "$PROMPT_DB_NOT_FOUND_ERROR"
 		fi
 	else
 		clear
@@ -120,12 +120,12 @@ function renameDB() {
 				printError "$PROMPT_DB_RENAMING_ERROR"
 			fi
 		else
-			printError "$PROMPT_INAVLID_DB_NAME"
+			printError "$PROMPT_INVALID_NAME"
 		fi
 
 	else
 		clear
-		printError "$PROMPT_INAVLID_DB_NAME"
+		printError "$PROMPT_INVALID_NAME"
 	fi
 	mainMenu
 }

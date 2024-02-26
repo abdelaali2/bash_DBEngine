@@ -36,15 +36,17 @@ export SCRITPT_DROP_TABLE=".dropTable.sh"
 export EXIT="Exit"
 export RETURN="Return"
 
+# Global Prompt Messages
+export PROMPT_INVALID_INPUT="Invalid input!"
+export PROMPT_INVALID_NAME="Invalid name! It must not start with a number or a special character\n"
+
 # Main Menu Prompt Messages
-export PROMPT_INVALID_INPUT="Invalid Input!"
 export PROMPT_READ_DB_NAME="Enter the database name: "
 export PROMPT_WELCOME="WELCOME\n"
 export PROMPT_WELCOME_BACK="WELCOME BACK\n"
 export PROMPT_DB_CREATION_DONE="Database created successfully\n"
 export PROMPT_DB_DUPLICATE_ERROR="Error: Database already exists\n"
-export PROMPT_DB_NOT_FOUND="Error: Database not found\n"
-export PROMPT_INAVLID_DB_NAME="Invalid database name. It must not start with a number or a special character\n"
+export PROMPT_DB_NOT_FOUND_ERROR="Error: Database not found\n"
 export PROMPT_CURRENT_DBS="Current databases:\n"
 export PROMPT_READ_NEW_DB_NAME="Enter the new database name: "
 export PROMPT_DB_RENAMING_DONE="Database renamed successfully\n"
@@ -60,7 +62,6 @@ export PROMPT_DB_DELETION_ERROR="Error: Unable to delete the database\n"
 export PROMPT_CURRENT_TABLES="Tables:\n"
 export PROMPT_READ_TABLE_NAME="Enter the table name: "
 export PROMPT_READ_COL_NUMBER="Enter the number of columns: "
-export PROMPT_INAVLID_TABLE_NAME="Invalid table name. It must not start with a number or a special character\n"
 export PROMPT_READ_COL_NAME="Enter the name of column no."
 export PROMPT_READ_COL_TYPE="Choose the type of the column"
 export PROMPT_ASSIGN_AS_PK="Assign this column as the pk?  (Yes/No): "
@@ -70,6 +71,7 @@ export PROPMPT_TABLE_DELETEION_CONFIRM="The table will be deleted permanently! C
 export PROMPT_TABLE_DELETION_CANCELLED="Table deletion cancelled\n"
 export PROMPT_TABLE_DELETION_DONE="Table deleted successfully\n"
 export PROMPT_TABLE_DELETION_ERROR="Error: Unable to drop the table\n"
+export PROMPT_TABLE_NOT_FOUND="Error: Table not found\n"
 
 # Data Constants
 export DATA_SEPARATOR="\t:\t"
