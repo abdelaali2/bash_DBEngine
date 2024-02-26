@@ -10,12 +10,14 @@ function tableMenu() {
 			source "$SCRIPT_CREATE_TABLE" "$currentDB"
 			;;
 		"$LIST_TABLES")
-			listTables
+			# shellcheck disable=SC1091
+			# shellcheck disable=SC1090
+			source "$SCRIPT_LIST_TABLES" "$currentDB"
 			;;
 		"$DROP_TABLE")
 			dropTable
 			;;
-		"$")
+		"$INSERT_INTO_TABLE")
 			insert
 			;;
 		"$SELECT_FROM_TABLE")
@@ -47,21 +49,10 @@ function tableMenu() {
 
 }
 
-function listTables() {
-	clear
-	echo -e "$PROMPT_CURRENT_TABLES"
-	for table in "$currentDB"/*; do
-		if [ -f "$table" ]; then
-			printListItem "$(basename -a "$table")"
-		fi
-	done
-	if [[ ! $1 ]]; then
-		tableMenu
-	fi
-}
-
 function dropTable() {
-	listTables "skipTableMenu"
+	# shellcheck disable=SC1091
+	# shellcheck disable=SC1090
+	source "$SCRIPT_LIST_TABLES" "$currentDB" "skipTableMenu"
 	tableName=$(readTableName "$PROMPT_READ_TABLE_NAME")
 
 	if textValidator "$tableName"; then
