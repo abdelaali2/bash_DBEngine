@@ -1,7 +1,12 @@
 #!/usr/bin/env bash
 function readInput() {
-    read -rep "$1" input
-    echo "${input// /_}"
+    plainText=$(readPlainText "$1")
+    echo "${plainText// /_}"
+}
+
+function readPlainText() {
+    read -rep "$(echo -e "$1")" input
+    echo "$input"
 }
 
 function nameValidator() {
