@@ -86,6 +86,7 @@ function listDBs() {
 }
 
 function connectToDB() {
+	# TODO: check if there is no db created already.
 	listDBs "skipMainMenu"
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
