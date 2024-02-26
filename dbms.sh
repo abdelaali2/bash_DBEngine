@@ -55,7 +55,7 @@ function mainMenu() {
 function CreateDB() {
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if textValidator "$dbName"; then
+	if nameValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [ -d "$dbPath" ]; then
@@ -90,7 +90,7 @@ function connectToDB() {
 	listDBs "skipMainMenu"
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if textValidator "$dbName"; then
+	if nameValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if [[ -d "$dbPath" ]]; then
@@ -112,9 +112,9 @@ function renameDB() {
 	listDBs "skipMainMenu"
 	oldDB=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if textValidator "$oldDB"; then
+	if nameValidator "$oldDB"; then
 		newDB=$(readInput "$PROMPT_READ_NEW_DB_NAME")
-		if textValidator "$newDB"; then
+		if nameValidator "$newDB"; then
 			if mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
 				printSuccess "$PROMPT_DB_RENAMING_DONE"
 			else
@@ -135,7 +135,7 @@ function deleteDB() {
 	listDBs "skipMainMenu"
 	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if textValidator "$dbName"; then
+	if nameValidator "$dbName"; then
 		dbPath="$RECORDS_DIRECTORY/$dbName"
 
 		if confirmChoice "$dbName:\n\t $PROMPT_DELETION_CONFIRM"; then

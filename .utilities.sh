@@ -4,7 +4,7 @@ function readInput() {
     echo "${input// /_}"
 }
 
-function textValidator() {
+function nameValidator() {
     regexChecker "$1" "$REGEX_NAMES"
     return $?
 }
@@ -60,7 +60,7 @@ function printGreeting() {
 function readTableName() {
     tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
 
-    while ! textValidator "$tableName"; do
+    while ! nameValidator "$tableName"; do
         clear
         printError "$PROMPT_INVALID_NAME"
         tableName=$(readInput "$PROMPT_READ_TABLE_NAME")

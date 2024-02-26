@@ -8,7 +8,7 @@ function dropTable() {
     source "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
     tableName=$(readTableName)
 
-    if textValidator "$tableName"; then
+    if nameValidator "$tableName"; then
         tablePath="./$DBinAction/$tableName"
         metaTablePath="./$DBinAction/.$tableName.meta"
         if confirmChoice "  $tableName:\n\t $PROPMPT_TABLE_DELETEION_CONFIRM"; then

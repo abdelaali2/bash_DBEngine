@@ -45,7 +45,7 @@ function readColumnName() {
     local counter=$1
     columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
 
-    while ! textValidator "$columnName"; do
+    while ! nameValidator "$columnName"; do
         local error
         error=$(printError "$PROMPT_INVALID_INPUT")
         unset "$error"
