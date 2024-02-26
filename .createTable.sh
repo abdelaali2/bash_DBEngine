@@ -19,6 +19,7 @@ function tableCreator() {
 
     for counter in $(seq "$numOfColumns"); do
         columnName=$(readColumnName "$counter")
+        tableHeader+=$columnName
         columnType=$(readColumnType "$columnName")
 
         if [[ $isPrimaryKey == false ]]; then
@@ -32,7 +33,7 @@ function tableCreator() {
 
         if [ "$counter" -lt "$numOfColumns" ]; then
             metaData+=$DATA_NEW_LINE
-            tableHeader+=$columnName$DATA_SEPARATOR
+            tableHeader+=$DATA_SEPARATOR
         fi
     done
 
