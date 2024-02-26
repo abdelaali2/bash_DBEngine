@@ -73,3 +73,17 @@ function readTableName() {
     done
     echo "$tableName"
 }
+
+function checkTableExistance() {
+    local dir
+    dir=$(dirname "$1")
+    local table
+    table=$(basename "$1")
+    local meta="$dir/.$table.meta"
+    if [ ! -f "$1" ] || [ ! -f "$meta" ]; then
+        printError "$PROMPT_TABLE_NOT_FOUND"
+        return 1
+    fi
+
+    return 0
+}
