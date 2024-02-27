@@ -33,6 +33,7 @@ export SCRIPT_CREATE_TABLE=".createTable.sh"
 export SCRIPT_LIST_TABLES=".listTables.sh"
 export SCRITPT_DROP_TABLE=".dropTable.sh"
 export SCRIPT_INSERT_INTO_TABLE=".insertIntoTable.sh"
+export SCRIPT_SELECT_FROM_TABLE=".selectFromTable.sh"
 
 # General Select Options
 export EXIT="Exit"
