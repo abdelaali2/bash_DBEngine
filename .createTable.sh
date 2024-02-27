@@ -19,16 +19,20 @@ function tableCreator() {
 
     for counter in $(seq "$numOfColumns"); do
         columnName=$(readColumnName "$counter")
-        tableHeader+=$columnName
         columnType=$(readColumnType "$columnName")
+
+        tableHeader+=$columnName
+        metaData+=$columnName$DATA_SEPARATOR$columnType$DATA_SEPARATOR
 
         if [[ $isPrimaryKey == false ]]; then
             if confirmPKAssignment; then
-                metaData+=$columnName$DATA_SEPARATOR$columnType${DATA_SEPARATOR}true
+                metaData+=true
                 isPrimaryKey=true
+            else
+                metaData+=false
             fi
         else
-            metaData+=$columnName$DATA_SEPARATOR$columnType${DATA_SEPARATOR}false
+            metaData+=false
         fi
 
         if [ "$counter" -lt "$numOfColumns" ]; then
@@ -45,7 +49,7 @@ function tableCreator() {
 function readColumnName() {
     local counter=$1
     columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
-
+    # TODO: Fix error handling message not being displayed
     while ! nameValidator "$columnName"; do
         local error
         error=$(printError "$PROMPT_INVALID_INPUT")
