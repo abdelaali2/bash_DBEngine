@@ -23,7 +23,6 @@ function dropTable() {
     else
         printError "$PROMPT_INVALID_INPUT"
     fi
-    echo "$tableName"
     tableMenu
 }
 
