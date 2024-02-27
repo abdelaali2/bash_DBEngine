@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-function readInput() {
+function readSanitizedText() {
     plainText=$(readPlainText "$1")
     echo "${plainText// /_}"
 }
@@ -30,6 +30,7 @@ function regexChecker() {
 function confirmChoice() {
     printWarning "$1"
     while true; do
+        # TODO: change to silent reading
         read -ren 1 answer
         case "$answer" in
         [Yy]*) return 0 ;;
@@ -62,16 +63,39 @@ function printGreeting() {
     echo -e "${STYLE_ON_ICYAN}$1${STYLE_NC}"
 }
 
-function readTableName() {
-    tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
+function readValidName() {
+    name=$(readSanitizedText "$1")
 
-    # TODO: replace while ! with until
-    while ! nameValidator "$tableName"; do
+    until nameValidator "$name"; do
         clear
         printError "$PROMPT_INVALID_NAME"
-        tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
+        name=$(readSanitizedText "$1")
     done
-    echo "$tableName"
+    echo "$name" >"$VALIDATION_STATE"
+}
+
+function readValidNumeric() {
+    local input
+    if [ "$2" ]; then
+        input=$2
+    else
+        input=$(readPlainText "$1")
+    fi
+
+    until numberValidator "$input"; do
+        clear
+        printError "$PROMPT_INVALID_INPUT"
+
+        input=$(readPlainText "$1")
+    done
+    echo "$input" >"$VALIDATION_STATE"
+}
+
+function retrieveValidatedInput() {
+    local value
+    value=$(cat "$VALIDATION_STATE")
+    echo "" >"$VALIDATION_STATE"
+    echo "$value"
 }
 
 function checkTableExistance() {

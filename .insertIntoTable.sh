@@ -7,12 +7,16 @@ function insertIntoTable() {
     # shellcheck disable=SC1090
     source "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
 
-    tableName=$(readTableName "$PROMPT_READ_TABLE_NAME")
+    readValidName "$PROMPT_READ_TABLE_NAME"
+    tableName=$(retrieveValidatedInput)
 
     tablePath="$DBinAction/$tableName"
 
     until checkTableExistance "$tablePath"; do
-        tableName=$(readTableName "$PROMPT_READ_TABLE_NAME")
+        readValidName "$PROMPT_READ_TABLE_NAME"
+        tableName=$(retrieveValidatedInput)
+
+        tablePath="$DBinAction/$tableName"
     done
 
     metaTablePath="$DBinAction/.$tableName.meta"
@@ -42,8 +46,7 @@ function insertIntoTable() {
 
     done
 
-    insertData "$data"
-
+    insertData "$row"
     row=""
 
     tableMenu
@@ -51,11 +54,8 @@ function insertIntoTable() {
 
 function numericInputHandler() {
     if [[ "$colType" == "$DATA_INTEGER" ]]; then
-        until numberValidator "$data"; do
-            clear
-            printError "$PROMPT_INVALID_DATATYPE_ERROR ($colType)"
-            data=$(readPlainText "$colName ($colType):  ")
-        done
+        readValidNumeric "$colName ($colType):  " "$data"
+        data=$(retrieveValidatedInput)
     fi
 }
 

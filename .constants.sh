@@ -3,6 +3,7 @@
 # Initilization Variables
 export DB_ENGINE=".dbEngine.sh"
 export RECORDS_DIRECTORY=".records"
+export VALIDATION_STATE=".valid.temp"
 
 # Styling
 export STYLE_NC='\033[0m'
@@ -46,6 +47,7 @@ export PROMPT_READ_DB_NAME="Enter the database name: "
 export PROMPT_WELCOME="WELCOME\n"
 export PROMPT_WELCOME_BACK="WELCOME BACK\n"
 export PROMPT_DB_CREATION_DONE="Database created successfully\n"
+export PROMPT_DB_CREATION_ERROR="Error: Unable to create the database\n"
 export PROMPT_DB_DUPLICATE_ERROR="Error: Database already exists\n"
 export PROMPT_DB_NOT_FOUND_ERROR="Error: Database not found\n"
 export PROMPT_CURRENT_DBS="Current databases:\n"

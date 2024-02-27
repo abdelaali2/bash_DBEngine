@@ -10,6 +10,9 @@ function initialization() {
 	source .constants.sh
 	# shellcheck disable=SC1091
 	source .utilities.sh
+	if [ ! -f "$VALIDATION_STATE" ]; then
+		touch "$VALIDATION_STATE"
+	fi
 
 	if [ ! -d "$RECORDS_DIRECTORY" ]; then
 		mkdir "$RECORDS_DIRECTORY"
@@ -53,22 +56,22 @@ function mainMenu() {
 }
 
 function CreateDB() {
-	dbName=$(readInput "$PROMPT_READ_DB_NAME")
+	readValidName "$PROMPT_READ_DB_NAME"
+	dbName=$(retrieveValidatedInput)
 
-	if nameValidator "$dbName"; then
-		dbPath="$RECORDS_DIRECTORY/$dbName"
+	dbPath="$RECORDS_DIRECTORY/$dbName"
 
-		if [ -d "$dbPath" ]; then
-			printError "$PROMPT_DB_DUPLICATE_ERROR"
-			mainMenu
-		fi
+	if [ -d "$dbPath" ]; then
+		printError "$PROMPT_DB_DUPLICATE_ERROR"
+		mainMenu
+	fi
 
-		mkdir -p "$dbPath" 2>>/dev/null
+	if mkdir -p "$dbPath" 2>>/dev/null; then
 		printSuccess "$PROMPT_DB_CREATION_DONE"
 	else
-		clear
-		printError "$PROMPT_INVALID_INPUT"
+		printError "$PROMPT_DB_CREATION_FAILED"
 	fi
+
 	mainMenu
 }
 
@@ -88,68 +91,57 @@ function listDBs() {
 function connectToDB() {
 	# TODO: check if there is no db created already.
 	listDBs "skipMainMenu"
-	dbName=$(readInput "$PROMPT_READ_DB_NAME")
+	readValidName "$PROMPT_READ_DB_NAME"
+	dbName=$(retrieveValidatedInput)
 
-	if nameValidator "$dbName"; then
-		dbPath="$RECORDS_DIRECTORY/$dbName"
+	dbPath="$RECORDS_DIRECTORY/$dbName"
 
-		if [[ -d "$dbPath" ]]; then
-			clear
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$DB_ENGINE" "$dbPath"
-		else
-			printError "$PROMPT_DB_NOT_FOUND_ERROR"
-		fi
-	else
+	if [[ -d "$dbPath" ]]; then
 		clear
-		printError "$PROMPT_INVALID_INPUT"
+		# shellcheck disable=SC1091
+		# shellcheck disable=SC1090
+		source "$DB_ENGINE" "$dbPath"
+	else
+		printError "$PROMPT_DB_NOT_FOUND_ERROR"
 	fi
+
 	mainMenu
 }
 
 function renameDB() {
 	listDBs "skipMainMenu"
-	oldDB=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if nameValidator "$oldDB"; then
-		newDB=$(readInput "$PROMPT_READ_NEW_DB_NAME")
-		if nameValidator "$newDB"; then
-			if mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
-				printSuccess "$PROMPT_DB_RENAMING_DONE"
-			else
-				printError "$PROMPT_DB_RENAMING_ERROR"
-			fi
-		else
-			printError "$PROMPT_INVALID_NAME"
-		fi
+	readValidName "$PROMPT_READ_DB_NAME"
+	oldDB=$(retrieveValidatedInput)
 
+	readValidName "$PROMPT_READ_DB_NAME"
+	newDB=$(retrieveValidatedInput)
+
+	if mv "$RECORDS_DIRECTORY/$oldDB" "$RECORDS_DIRECTORY/$newDB"; then
+		printSuccess "$PROMPT_DB_RENAMING_DONE"
 	else
-		clear
-		printError "$PROMPT_INVALID_NAME"
+		printError "$PROMPT_DB_RENAMING_ERROR"
 	fi
+
 	mainMenu
 }
 
 function deleteDB() {
 	listDBs "skipMainMenu"
-	dbName=$(readInput "$PROMPT_READ_DB_NAME")
 
-	if nameValidator "$dbName"; then
-		dbPath="$RECORDS_DIRECTORY/$dbName"
+	readValidName "$PROMPT_READ_DB_NAME"
+	dbName=$(retrieveValidatedInput)
 
-		if confirmChoice "$dbName:\n\t $PROMPT_DELETION_CONFIRM"; then
-			if rm -r "$dbPath" 2>>/dev/null; then
-				printSuccess "$PROMPT_DB_DELETION_DONE"
-			else
-				printError "$PROMPT_DB_DELETION_ERROR"
-			fi
+	dbPath="$RECORDS_DIRECTORY/$dbName"
+
+	if confirmChoice "$dbName:\n\t $PROMPT_DELETION_CONFIRM"; then
+		if rm -r "$dbPath" 2>>/dev/null; then
+			printSuccess "$PROMPT_DB_DELETION_DONE"
 		else
-			printWarning "$PROMPT_DB_DELETION_CANCELLED"
+			printError "$PROMPT_DB_DELETION_ERROR"
 		fi
 	else
-		clear
-		printError "$PROMPT_INVALID_INPUT"
+		printWarning "$PROMPT_DB_DELETION_CANCELLED"
 	fi
 
 	mainMenu

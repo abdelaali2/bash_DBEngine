@@ -2,23 +2,22 @@
 
 DBinAction=$1
 
-function readNumOfColumns() {
-    numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
-
-    while ! numberValidator "$numOfColumns"; do
-        clear
-        printError "$PROMPT_INVALID_INPUT"
-        numOfColumns=$(readInput "$PROMPT_READ_COL_NUMBER")
-    done
-}
-
 function tableCreator() {
     isPrimaryKey=false
     metaData=$DATA_HEADER
     tableHeader=""
 
+    readValidName "$PROMPT_READ_TABLE_NAME"
+    tableName=$(retrieveValidatedInput)
+
+    readValidNumeric "$PROMPT_READ_COL_NUMBER"
+    numOfColumns=$(retrieveValidatedInput)
+
     for counter in $(seq "$numOfColumns"); do
-        columnName=$(readColumnName "$counter")
+
+        readValidName "$PROMPT_READ_COL_NAME$counter: "
+        columnName=$(retrieveValidatedInput)
+
         columnType=$(readColumnType "$columnName")
 
         tableHeader+=$columnName
@@ -44,21 +43,6 @@ function tableCreator() {
     writeToFiles "$metaData" "$tableHeader"
 
     tableMenu
-}
-
-function readColumnName() {
-    local counter=$1
-    columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
-    # TODO: Fix error handling message not being displayed
-    while ! nameValidator "$columnName"; do
-        local error
-        error=$(printError "$PROMPT_INVALID_INPUT")
-        unset "$error"
-        columnName=$(readInput "$PROMPT_READ_COL_NAME$counter: ")
-    done
-
-    echo "$columnName"
-
 }
 
 function readColumnType() {
@@ -105,6 +89,4 @@ function writeToFiles() {
     fi
 }
 
-tableName=$(readTableName)
-readNumOfColumns
 tableCreator
