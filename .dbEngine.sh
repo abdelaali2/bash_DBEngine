@@ -20,7 +20,9 @@ function tableMenu() {
 			source "$SCRITPT_DROP_TABLE" "$currentDB"
 			;;
 		"$INSERT_INTO_TABLE")
-			insert
+			# shellcheck disable=SC1091
+			# shellcheck disable=SC1090
+			source "$SCRIPT_INSERT_INTO_TABLE" "$currentDB"
 			;;
 		"$SELECT_FROM_TABLE")
 			selectfromTable
@@ -49,64 +51,6 @@ function tableMenu() {
 		esac
 	done
 
-}
-
-function insert() {
-	tableName=$(readInput "$PROMPT_READ_TABLE_NAME")
-	case $tableName in
-	+([a-zA-Z]*))
-		test ! -f ${tableName} && echo -e "${tableName} does not exist" && tableMenu
-		;;
-	*)
-		echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
-		tableMenu
-		;;
-	esac
-
-	numberOfColumns=$(awk 'END{print NR}' ".${tableName}_metaData")
-	DATA_SEPARATOR=":"
-	DATA_NEW_LINE="\n"
-	for ((i = 2; i <= ${numberOfColumns}; i++)); do
-		#loop 3ala el meta data we b3mlohm store fe var 3shan a3ml check lama el user y3ml insert
-		columnName=$(awk 'BEGIN{FS=":"}{ if(NR == '${i}') print $1}' ".${tableName}_metaData")
-		columnType=$(awk 'BEGIN{FS=":"}{if(NR == '${i}') print $2}' ".${tableName}_metaData")
-		columnKey=$(awk 'BEGIN{FS=":"}{if(NR == '${i}') print $3}' ".${tableName}_metaData")
-
-		#habd2 as2l el user yd5l el data
-		read -e -p "Enter data in the ${columnName} column (${columnType}): " data
-
-		#habd2 a3ml check 3ala el data
-		if [ "${columnType}" = "int" ]; then
-			until [[ $data =~ ^[0-9]*$ ]]; do
-				echo -e "${STYLE_ON_IRED}$PROMPT_INVALID_INPUT${STYLE_NC}"
-				read -e -p "Enter the data in ${columnName} (${columnType}): " data
-			done
-		fi
-
-		if [ "${columnKey}" = "PK" ]; then
-
-			until ! [[ ($data =~ ^[$(awk 'BEGIN{FS="|" ; ORS=" "}{if(NR != 1)print $(('$i'-1))}' ${tableName})]$ || -z ${data}) ]]; do
-				echo -e "invalid input for Primary Key , Primary key should be unique and not null!\n"
-				read -e -p "Enter the data in ${columnName} (${columnType}): " data
-			done
-		fi
-
-		if [ ${i} -eq ${numberOfColumns} ]; then
-			row=$row$data$DATA_NEW_LINE
-		else
-			row=$row$data$DATA_SEPARATOR
-		fi
-
-	done
-
-	echo -e $row >>$tableName
-	if [ $? -eq 0 ]; then
-		echo -e "Data Inserted Successfully\n"
-	else
-		echo -e "Error Inserting Data into Table ${tableName}\n"
-	fi
-	row=""
-	tableMenu
 }
 
 function selectfromTable() {

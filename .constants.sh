@@ -31,6 +31,7 @@ export DELETE_FROM_TABLE="Delete from table"
 export SCRIPT_CREATE_TABLE=".createTable.sh"
 export SCRIPT_LIST_TABLES=".listTables.sh"
 export SCRITPT_DROP_TABLE=".dropTable.sh"
+export SCRIPT_INSERT_INTO_TABLE=".insertIntoTable.sh"
 
 # General Select Options
 export EXIT="Exit"
@@ -72,6 +73,11 @@ export PROMPT_TABLE_DELETION_CANCELLED="Table deletion cancelled\n"
 export PROMPT_TABLE_DELETION_DONE="Table deleted successfully\n"
 export PROMPT_TABLE_DELETION_ERROR="Error: Unable to drop the table\n"
 export PROMPT_TABLE_NOT_FOUND="Error: Table not found\n"
+export PROMPT_INVALID_DATATYPE_ERROR="Error: Invalid datatype! Expected:"
+export PROMPT_PK_DUPLICATE_ERROR="Error: Duplicate primary key violation!\n"
+export PROMPT_PK_NULL_ERROR="Error: Null primary key violation!\n"
+export PROMPT_DATA_INSERTION_DONE="Data inserted successfully\n"
+export PROMPT_DATA_INSERTION_ERROR="Error: Unable to insert data\n"
 
 # Data Constants
 export DATA_SEPARATOR=":"

@@ -32,13 +32,8 @@ function insertIntoTable() {
 
         data=$(readPlainText "$colName ($colType):   ")
 
-        if [[ "$colType" == "$DATA_INTEGER" ]]; then
-            handleIntegerScenario "$data"
-        fi
-
-        if [[ "$isPK" == true ]]; then
-            handlePKScenario "$data"
-        fi
+        numericInputHandler
+        PKHandler
 
         row+=$data
         if [ "$i" -lt "$numOfColumns" ]; then
@@ -54,36 +49,35 @@ function insertIntoTable() {
     tableMenu
 }
 
-function handleIntegerScenario() {
-    until numberValidator "$1"; do
-        clear
-        printError "$PROMPT_INVALID_INPUT $PROMPT_INVALID_DATATYPE_ERROR ($colType)"
-        data=$(readPlainText "$colName ($colType): \t")
-    done
+function numericInputHandler() {
+    if [[ "$colType" == "$DATA_INTEGER" ]]; then
+        until numberValidator "$data"; do
+            clear
+            printError "$PROMPT_INVALID_DATATYPE_ERROR ($colType)"
+            data=$(readPlainText "$colName ($colType):  ")
+        done
+    fi
 }
 
-function handlePKScenario() {
-    until applyPKConstraints "$1"; do
-        clear
-        errorCode=$(applyPKConstraints "$1")
-        case "$errorCode" in
-        1)
-            printError "$PROMPT_PK_DUPLICATE_ERROR"
-            ;;
-        2)
-            printError "$PROMPT_PK_NULL_ERROR"
-            ;;
-        esac
-        data=$(readPlainText "$colName ($colType): \t")
-    done
+function PKHandler() {
+    if [[ "$isPK" == true ]]; then
+        until applyPKConstraints "$data"; do
+            errorCode=$?
+            data=""
+            clear
+            printRelevantPKErrors "$errorCode"
+            data=$(readPlainText "$colName ($colType):  ")
+            numericInputHandler
+        done
+    fi
 }
 
 function applyPKConstraints() {
-    if checkPKDuplciation "$1"; then
+    if ! checkPKDuplciation "$1"; then
         return 2
     fi
 
-    if checkIfNull "$1"; then
+    if ! checkIfNotNull "$1"; then
         return 1
     fi
 
@@ -99,30 +93,44 @@ function checkIfNotNull() {
 }
 
 function checkPKDuplciation() {
-    isDuplicatePK=false
-
-    awk -v data="$1" -v i="$i" -v isDuplicatePK="$isDuplicatePK" -v DATA_SEPARATOR="$DATA_SEPARATOR" '
+    local result
+    result=$(awk -v data="$1" -v i="$i" -v DATA_SEPARATOR="$DATA_SEPARATOR" '
 		BEGIN {
 			FS = DATA_SEPARATOR
-			ORS = " "
+			isDuplicate = "false"
 		}
 		NR != 1 {
 			if (data == $(i-1)) {
-				isDuplicatePK="true"
+				isDuplicate = "true"
+				exit 1
 			}
 		}
-	' "$tablePath"
+		END {
+			print isDuplicate
+		}
+	' "$tablePath")
 
-    if [[ $isDuplicatePK == true ]]; then
+    if [[ $result == true ]]; then
         return 1
     fi
 
     return 0
 }
 
+function printRelevantPKErrors() {
+    case "$1" in
+    1)
+        printError "$PROMPT_PK_NULL_ERROR"
+        ;;
+    2)
+        printError "$PROMPT_PK_DUPLICATE_ERROR"
+        ;;
+    esac
+}
+
 function insertData() {
     if echo -e "$1" >>"$tablePath"; then
-        printSuccess "$PROMPT_PK_DATA_INSERTION_DONE"
+        printSuccess "$PROMPT_DATA_INSERTION_DONE"
     else
         printError "$PROMPT_DATA_INSERTION_ERROR"
     fi
