@@ -6,10 +6,11 @@ function initialization() {
 	shopt -s extglob
 	export LC_COLLATE=C
 
-	# shellcheck disable=SC1091
+	# shellcheck source=./.script.sh
 	source .constants.sh
 	# shellcheck disable=SC1091
 	source .utilities.sh
+
 	if [ ! -f "$VALIDATION_STATE" ]; then
 		touch "$VALIDATION_STATE"
 	fi
@@ -98,9 +99,7 @@ function connectToDB() {
 
 	if [[ -d "$dbPath" ]]; then
 		clear
-		# shellcheck disable=SC1091
-		# shellcheck disable=SC1090
-		source "$DB_ENGINE" "$dbPath"
+		sourceFile "$DB_ENGINE" "$dbPath"
 	else
 		printError "$PROMPT_DB_NOT_FOUND_ERROR"
 	fi

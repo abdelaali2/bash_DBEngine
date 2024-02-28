@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+
+function sourceFile() {
+    # shellcheck disable=SC1090
+    source "$1" "${@:2}"
+}
+
 function readSanitizedText() {
     plainText=$(readPlainText "$1")
     echo "${plainText// /_}"
@@ -106,6 +112,19 @@ function checkTableExistance() {
     local meta="$dir/.$table.meta"
     if [ ! -f "$1" ] || [ ! -f "$meta" ]; then
         printError "$PROMPT_TABLE_NOT_FOUND"
+        return 1
+    fi
+
+    return 0
+}
+
+function pauseExecution() {
+    readPlainText "$PROPMPT_ENTER_TO_CONTINUE"
+}
+
+function checkIfNotEmptySet() {
+    if [[ $(wc -l "$1") -le 1 ]]; then
+        printWarning "$PROMPT_EMPTY_SET"
         return 1
     fi
 

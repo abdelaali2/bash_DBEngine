@@ -5,29 +5,19 @@ function tableMenu() {
 	select choice in "$CREATE_TABLE" "$LIST_TABLES" "$DROP_TABLE" "$INSERT_INTO_TABLE" "$SELECT_FROM_TABLE" "$DELETE_FROM_TABLE" "$UPDATE_TABLE" "$EXIT" "$RETURN"; do
 		case $choice in
 		"$CREATE_TABLE")
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$SCRIPT_CREATE_TABLE" "$currentDB"
+			sourceFile "$SCRIPT_CREATE_TABLE" "$currentDB"
 			;;
 		"$LIST_TABLES")
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$SCRIPT_LIST_TABLES" "$currentDB"
+			sourceFile "$SCRIPT_LIST_TABLES" "$currentDB"
 			;;
 		"$DROP_TABLE")
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$SCRITPT_DROP_TABLE" "$currentDB"
+			sourceFile "$SCRITPT_DROP_TABLE" "$currentDB"
 			;;
 		"$INSERT_INTO_TABLE")
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$SCRIPT_INSERT_INTO_TABLE" "$currentDB"
+			sourceFile "$SCRIPT_INSERT_INTO_TABLE" "$currentDB"
 			;;
 		"$SELECT_FROM_TABLE")
-			# shellcheck disable=SC1091
-			# shellcheck disable=SC1090
-			source "$SCRIPT_SELECT_FROM_TABLE" "$currentDB"
+			sourceFile "$SCRIPT_SELECT_FROM_TABLE" "$currentDB"
 			;;
 
 		"$DELETE_FROM_TABLE")

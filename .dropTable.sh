@@ -3,9 +3,7 @@
 DBinAction=$1
 
 function dropTable() {
-    # shellcheck disable=SC1091
-    # shellcheck disable=SC1090
-    source "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
+    sourceFile "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
 
     readValidName "$PROMPT_READ_TABLE_NAME"
     tableName=$(retrieveValidatedInput)
