@@ -7,19 +7,21 @@ export VALIDATION_STATE=".valid.temp"
 
 # Styling
 export STYLE_NC='\033[0m'
+export STYLE_BLUE='\033[0;34m'
 export STYLE_YELLOW='\033[0;33m'
 export STYLE_ON_IRED='\033[0;41m'
-export STYLE_ON_ICYAN='\033[0;46m'
+export STYLE_ON_IWHITE='\033[0;55m'
 export STYLE_ON_IGREEN='\033[0;42m'
+export STYLE_ON_IMAGENTA='\033[0;46m'
 
-# Main Menu Select Options
+# Main Menu Options
 export LIST_DB="List databases"
 export CREATE_DB="Create database"
-export DELETE_DB="Delete Database"
-export RENAME_DB="Rename a database"
-export CONNECT_TO_DB="Connect to a database"
+export DELETE_DB="Delete database"
+export RENAME_DB="Rename database"
+export CONNECT_TO_DB="Connect to database"
 
-# Table Menu Select Options
+# Table Menu Options
 export DROP_TABLE="Drop table"
 export LIST_TABLES="List tables"
 export CREATE_TABLE="Create table"
@@ -35,6 +37,12 @@ export SCRITPT_DROP_TABLE=".dropTable.sh"
 export SCRIPT_INSERT_INTO_TABLE=".insertIntoTable.sh"
 export SCRIPT_SELECT_FROM_TABLE=".selectFromTable.sh"
 
+# Table Selection Menu Options
+export SELECT_ALL="Select all"
+export SELECT_ENTIRE_COLUMN="Select entire column"
+export SELECT_ENTIRE_ROW="Select entire row"
+export SELECT_CERTAIN_VALUES="Select certain value"
+
 # General Select Options
 export EXIT="Exit"
 export RETURN="Return"
@@ -42,6 +50,8 @@ export RETURN="Return"
 # Global Prompt Messages
 export PROMPT_INVALID_INPUT="Invalid input!"
 export PROMPT_INVALID_NAME="Invalid name! It must not start with a number or a special character\n"
+export PROPMPT_ENTER_TO_CONTINUE="Press 'Enter' to proceed"
+export PROMPT_EMPTY_SET="Empty set!\n"
 
 # Main Menu Prompt Messages
 export PROMPT_READ_DB_NAME="Enter the database name: "
@@ -81,6 +91,11 @@ export PROMPT_PK_DUPLICATE_ERROR="Error: Duplicate primary key violation!\n"
 export PROMPT_PK_NULL_ERROR="Error: Null primary key violation!\n"
 export PROMPT_DATA_INSERTION_DONE="Data inserted successfully\n"
 export PROMPT_DATA_INSERTION_ERROR="Error: Unable to insert data\n"
+
+# Table Selection Menu Prompt Messages
+export PROMPT_EXISTING_COLS="Existing columns:"
+export PROMPT_SELECT_COL="Select column number: "
+export PROMPT_COL_OUTBOUND_ERROR="Error: Index outbound!\n"
 
 # Data Constants
 export DATA_SEPARATOR=":"

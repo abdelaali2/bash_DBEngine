@@ -62,12 +62,20 @@ function printWarning() {
 }
 
 function printListItem() {
-    echo -e "==>  $1\n"
+    echo -e "==>${STYLE_BLUE} $1${STYLE_NC}\n"
+}
+
+function printList() {
+    while IFS= read -r line; do
+        echo -e "  $line"
+    done <<<"$1"
 }
 
 function printGreeting() {
-    echo -e "${STYLE_ON_ICYAN}$1${STYLE_NC}"
+    echo -e "${STYLE_ON_IMAGENTA}$1${STYLE_NC}"
 }
+
+# TODO: add support for receiving commands and execting them at validation
 
 function readValidName() {
     name=$(readSanitizedText "$1")
@@ -120,10 +128,29 @@ function checkTableExistance() {
 
 function pauseExecution() {
     readPlainText "$PROPMPT_ENTER_TO_CONTINUE"
+    clear
 }
 
-function checkIfNotEmptySet() {
+function checkNotEmpty() {
+    if [ -f "$1" ]; then
+        checkNotEmptyFile "$1"
+    else
+        checkNotEmptyData "$1"
+    fi
+    return $?
+}
+
+function checkNotEmptyFile() {
     if [[ $(wc -l "$1" | cut -d' ' -f1) -le 1 ]]; then
+        printWarning "$PROMPT_EMPTY_SET"
+        return 1
+    fi
+
+    return 0
+}
+
+function checkNotEmptyData() {
+    if [ -z "$1" ]; then
         printWarning "$PROMPT_EMPTY_SET"
         return 1
     fi
