@@ -123,7 +123,7 @@ function pauseExecution() {
 }
 
 function checkIfNotEmptySet() {
-    if [[ $(wc -l "$1") -le 1 ]]; then
+    if [[ $(wc -l "$1" | cut -d' ' -f1) -le 1 ]]; then
         printWarning "$PROMPT_EMPTY_SET"
         return 1
     fi
