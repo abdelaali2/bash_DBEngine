@@ -20,8 +20,8 @@ function nameValidator() {
     return $?
 }
 
-function numberValidator() {
-    regexChecker "$1" "$REGEX_NUMERIC"
+function positiveNumberValidator() {
+    regexChecker "$1" "$REGEX_POSITIVE_NUMBERS"
     return $?
 }
 
@@ -31,6 +31,45 @@ function regexChecker() {
     else
         return 1
     fi
+}
+
+# TODO: add support for receiving commands and execting them at validation
+# TODO: Implement unified validation function
+
+function readValidName() {
+    name=$(readSanitizedText "$1")
+
+    until nameValidator "$name"; do
+        clear
+        printError "$PROMPT_INVALID_NAME"
+        name=$(readSanitizedText "$1")
+    done
+    echo "$name" >"$VALIDATION_STATE"
+}
+
+# TODO: change this function name to readValidPositiveNumber
+function readValidNumeric() {
+    local input
+    if [ "$2" ]; then
+        input=$2
+    else
+        input=$(readPlainText "$1")
+    fi
+
+    until positiveNumberValidator "$input"; do
+        clear
+        printError "$PROMPT_INVALID_INPUT"
+
+        input=$(readPlainText "$1")
+    done
+    echo "$input" >"$VALIDATION_STATE"
+}
+
+function retrieveValidatedInput() {
+    local value
+    value=$(cat "$VALIDATION_STATE")
+    echo "" >"$VALIDATION_STATE"
+    echo "$value"
 }
 
 function confirmChoice() {
@@ -73,43 +112,6 @@ function printList() {
 
 function printGreeting() {
     echo -e "${STYLE_ON_IMAGENTA}$1${STYLE_NC}"
-}
-
-# TODO: add support for receiving commands and execting them at validation
-
-function readValidName() {
-    name=$(readSanitizedText "$1")
-
-    until nameValidator "$name"; do
-        clear
-        printError "$PROMPT_INVALID_NAME"
-        name=$(readSanitizedText "$1")
-    done
-    echo "$name" >"$VALIDATION_STATE"
-}
-
-function readValidNumeric() {
-    local input
-    if [ "$2" ]; then
-        input=$2
-    else
-        input=$(readPlainText "$1")
-    fi
-
-    until numberValidator "$input"; do
-        clear
-        printError "$PROMPT_INVALID_INPUT"
-
-        input=$(readPlainText "$1")
-    done
-    echo "$input" >"$VALIDATION_STATE"
-}
-
-function retrieveValidatedInput() {
-    local value
-    value=$(cat "$VALIDATION_STATE")
-    echo "" >"$VALIDATION_STATE"
-    echo "$value"
 }
 
 function checkTableExistance() {

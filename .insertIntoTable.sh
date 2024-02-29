@@ -2,6 +2,7 @@
 
 DBinAction=$1
 
+# TODO: check logic here & refactor the code more
 function insertIntoTable() {
     sourceFile "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
 
