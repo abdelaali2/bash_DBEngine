@@ -5,6 +5,24 @@ function sourceFile() {
     source "$1" "${@:2}"
 }
 
+# TODO: embed the error message handler globally
+function handleErrorMessage() {
+    local error_message
+    clear
+
+    while [ $# -gt 0 ]; do
+        case "$1" in
+        --error)
+            shift
+            error_message="$1"
+            ;;
+        esac
+        shift
+    done
+
+    printError "$error_message"
+}
+
 function readSanitizedText() {
     plainText=$(readPlainText "$1")
     echo "${plainText// /_}"
@@ -46,7 +64,7 @@ function readValidName() {
     name=$(readSanitizedText "$1")
 
     until nameValidator "$name"; do
-        clear
+        # clear
         printError "$PROMPT_INVALID_NAME"
         name=$(readSanitizedText "$1")
     done

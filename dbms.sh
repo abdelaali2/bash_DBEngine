@@ -23,6 +23,8 @@ function initialization() {
 		clear
 		printGreeting "$PROMPT_WELCOME_BACK"
 	fi
+
+	# TODO: add SIGINT handler
 }
 
 initialization
