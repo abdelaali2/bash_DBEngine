@@ -96,6 +96,8 @@ export PROMPT_DATA_INSERTION_ERROR="Error: Unable to insert data\n"
 export PROMPT_EXISTING_COLS="Existing columns:"
 export PROMPT_SELECT_COL="Select column number: "
 export PROMPT_COL_OUTBOUND_ERROR="Error: Index outbound!\n"
+export PROMPT_ENTER_QUERY="Enter your search query: "
+export PROMPT_QUERY_DONE="Query OK!\n"
 
 # Data Constants
 export DATA_SEPARATOR=":"
@@ -105,5 +107,6 @@ export DATA_INTEGER="Integer"
 export DATA_STRING="String"
 
 # REGEXP Constants
-export REGEX_NUMERIC="^([1-9][0-9]*)$"
 export REGEX_NAMES="^[a-zA-Z][a-zA-Z0-9]*$"
+export REGEX_ANY_NUMBER="-?[0-9]+(\.[0-9]+)?"
+export REGEX_POSITIVE_NUMBERS="^([1-9][0-9]*)$"

@@ -25,6 +25,11 @@ function positiveNumberValidator() {
     return $?
 }
 
+function integerValidator() {
+    regexChecker "$1" "$REGEX_ANY_NUMBER"
+    return $?
+}
+
 function regexChecker() {
     if [[ $1 =~ $2 ]]; then
         return 0
@@ -37,6 +42,7 @@ function regexChecker() {
 # TODO: Implement unified validation function
 
 function readValidName() {
+    local name
     name=$(readSanitizedText "$1")
 
     until nameValidator "$name"; do
@@ -57,6 +63,23 @@ function readValidNumeric() {
     fi
 
     until positiveNumberValidator "$input"; do
+        clear
+        printError "$PROMPT_INVALID_INPUT"
+
+        input=$(readPlainText "$1")
+    done
+    echo "$input" >"$VALIDATION_STATE"
+}
+
+function readValidInteger() {
+    local input
+    if [ "$2" ]; then
+        input=$2
+    else
+        input=$(readPlainText "$1")
+    fi
+
+    until integerValidator "$input"; do
         clear
         printError "$PROMPT_INVALID_INPUT"
 
@@ -104,9 +127,10 @@ function printListItem() {
     echo -e "==>${STYLE_BLUE} $1${STYLE_NC}\n"
 }
 
+# TODO: rename this function to printColumn
 function printList() {
     while IFS= read -r line; do
-        echo -e "  $line"
+        echo -e " $line"
     done <<<"$1"
 }
 
@@ -135,16 +159,16 @@ function pauseExecution() {
 
 function checkNotEmpty() {
     if [ -f "$1" ]; then
-        checkNotEmptyFile "$1"
+        checkNotEmptyFile "$@"
     else
-        checkNotEmptyData "$1"
+        checkNotEmptyData "$@"
     fi
     return $?
 }
 
 function checkNotEmptyFile() {
     if [[ $(wc -l "$1" | cut -d' ' -f1) -le 1 ]]; then
-        printWarning "$PROMPT_EMPTY_SET"
+        printWarning "$2"
         return 1
     fi
 
@@ -153,7 +177,7 @@ function checkNotEmptyFile() {
 
 function checkNotEmptyData() {
     if [ -z "$1" ]; then
-        printWarning "$PROMPT_EMPTY_SET"
+        printWarning "$2"
         return 1
     fi
 

@@ -2,7 +2,9 @@
 
 DBinAction=$1
 
-function selectfromTable() {
+function selectFromTable() {
+    handleErrorMessage
+
     sourceFile "$SCRIPT_LIST_TABLES" "$DBinAction" "skipTableMenu"
 
     checkAndPromptTableName() {
@@ -30,133 +32,15 @@ function selectfromTable() {
         "$SELECT_ENTIRE_COLUMN")
             selectEntireColumn
             ;;
-        "$SELECT_ENTIRE_ROW")
-            typeset -i listofCol
-            typeset -i selectedCol
-
-            echo -e "The existing Columns are: \n======================="
-            awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
-            listofCol=$( (awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l))
-
-            read -p "Enter the No. of the Column you want to Select from: " selectedCol
-            case ${selectedCol} in
-            +([1-9]))
-                if [[ $selectedCol -le $listofCol ]]; then
-                    selectedCol=$selectedCol+1
-                    sed -n ${selectedCol}p ./.${tableName}_metaData | grep int >/dev/null
-                    let ifInt=$?
-                    if [[ ifInt -eq 0 ]]; then
-                        echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
-                        read requiredData
-                        index=$(awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | cut -d: -f1)
-                        if [ -z $index ]; then
-                            echo "***Empty Set***"
-                        else
-                            for i in $index; do
-                                sed -n ${i}p ./${tableName}
-                            done
-                        fi
-                    else
-                        sed -n ${selectedCol}p ./.${tableName}_metaData | grep string >/dev/null
-                        let ifString=$?
-                        if [[ ifString -eq 0 ]]; then
-                            echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
-                            read requiredData
-                            index=$(awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -iwn $requiredData | cut -d: -f1)
-
-                            if [ -z $index ]; then
-                                echo "***Empty Set***"
-                            else
-                                for i in $index; do
-                                    sed -n ${i}p ./${tableName}
-                                done
-                            fi
-                        fi
-
-                    fi
-
-                    pauseExecution
-                    selectfromTable
-                else
-                    echo -e "Invalid Column No.!\nReturning back to Select Menu"
-                    sleep 3
-                    selectfromTable
-                fi
-                ;;
-            *)
-                echo -e "Invalid Column No.!\nReturning back to Select Menu"
-                sleep 3
-                selectfromTable
-                ;;
-            esac
-            ;;
-        "$SELECT_CERTAIN_VALUES")
-            typeset -i listofCol
-            typeset -i selectedCol
-
-            echo -e "The existing Columns are: \n======================="
-            awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
-            listofCol=$( (awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l))
-
-            read -p "Enter the No. of the Column you want to Select from: " selectedCol
-            case ${selectedCol} in
-            +([1-9]))
-                if [[ $selectedCol -le $listofCol ]]; then
-                    selectedCol=$selectedCol+1
-                    sed -n ${selectedCol}p ./.${tableName}_metaData | grep int >/dev/null
-                    let ifInt=$?
-                    selectedCol=$selectedCol-1
-                    if [[ ifInt -eq 0 ]]; then
-                        echo -e "You choose an Integer type Column.\nPlease enter the No. you want to search for"
-                        read requiredData
-                        result=$(awk -F: -v grab=$selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData)
-                        resultLine=$(echo $result | awk -F: -v RS=' ' '{print $1}')
-                        if [ -z $result ]; then
-                            echo "***Empty Set***"
-                        else
-                            echo "========================================="
-                            echo "  value $requiredData exists in line"
-                            echo -e "\t"$resultLine
-                            echo "========================================="
-                        fi
-                    else
-                        selectedCol=$selectedCol+1
-                        sed -n ${selectedCol}p ./.${tableName}_metaData | grep string >/dev/null
-                        let ifString=$?
-                        selectedCol=$selectedCol-1
-                        if [[ ifString -eq 0 ]]; then
-                            echo -e "You choose a String type Column.\nPlease enter the word you want to search for"
-                            read requiredData
-                            result=$(awk -F: -v grab=$selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData)
-                            resultLine=$(echo $result | awk -F: -v RS=' ' '{print $1}')
-                            if [ -z "$result" ]; then
-                                echo "***Empty Set***"
-                            else
-                                echo "========================================="
-                                echo "  value $requiredData exists in line"
-                                echo -e "\t"$resultLine
-                                echo "========================================="
-                            fi
-                        fi
-
-                    fi
-                    pauseExecution
-                    selectfromTable
-                else
-                    echo -e "Invalid Column No.!\nReturning back to Select Menu"
-                    sleep 3
-                    selectfromTable
-                fi
-                ;;
-            *)
-                echo -e "Invalid Column No.!\nReturning back to Select Menu"
-                sleep 3
-                selectfromTable
-                ;;
-            esac
+        "$SELECT_ENTIRE_ROW" | "$SELECT_CERTAIN_VALUES")
+            selectRow "$input"
             ;;
         "$RETURN")
             tableMenu
+            ;;
+        *)
+            selectFromTable
+            printError "$PROMPT_INVALID_INPUT"
             ;;
         esac
     done
@@ -165,38 +49,34 @@ function selectfromTable() {
 }
 
 function selectAll() {
-    if checkNotEmpty "$tablePath"; then
-        more "$tablePath"
-    fi
+    local content
+    content=$(awk -F"$DATA_SEPARATOR" '
+        NR>1 {
+            print
+        }
+    ' "$tablePath")
+
+    displayResults "$tableName" "$content"
 
     pauseExecution
-
-    clear
     tableMenu
 }
 
 function selectEntireColumn() {
     queryMetaTable "$metaTablePath"
 
-    readValidNumeric "$PROMPT_SELECT_COL"
-    selectedCol=$(retrieveValidatedInput)
-
-    until [[ $selectedCol -le $numOfCols ]]; do
-        printError "$PROMPT_COL_OUTBOUND_ERROR"
-        readValidNumeric "$PROMPT_SELECT_COL"
-        selectedCol=$(retrieveValidatedInput)
-    done
+    getColIndex "$numOfCols"
 
     queryDataTable "$selectedCol" "$tablePath"
-    pauseExecution
 
+    pauseExecution
     tableMenu
 }
 
 function queryMetaTable() {
     echo -e "$PROMPT_EXISTING_COLS"
     columns=$(
-        awk -F: '
+        awk -F"$DATA_SEPARATOR" '
             NR > 1 {
                 print NR-1 " - " $1
             }
@@ -208,19 +88,75 @@ function queryMetaTable() {
     printList "$columns"
 }
 
+function getColIndex() {
+    readValidNumeric "$PROMPT_SELECT_COL"
+    selectedCol=$(retrieveValidatedInput)
+
+    until [[ $selectedCol -le $1 ]]; do
+        printError "$PROMPT_COL_OUTBOUND_ERROR"
+        readValidNumeric "$PROMPT_SELECT_COL"
+        selectedCol=$(retrieveValidatedInput)
+    done
+}
+
 function queryDataTable() {
-    result=$(awk -F: -v grab="$1" 'NR>1 {
-            print $grab
-        }' "$2")
+    local result
+    local header
 
     header=$(awk -F: -v grab="$1" 'NR==1 {
-            print $grab
-        }' "$2")
+        print $grab
+    }' "$2")
 
-    printSuccess "$header"
-    if checkNotEmpty "$result"; then
-        echo "$result"
+    result=$(awk -F: -v grab="$1" 'NR>1 {
+        print $grab
+    }' "$2")
+
+    displayResults "$header" "$result"
+}
+
+function displayResults() {
+    printSuccess "$1"
+    if checkNotEmpty "$2" "$PROMPT_EMPTY_SET"; then
+        printList "$2"
     fi
 }
 
-selectfromTable
+function selectRow() {
+    set -x
+    local query
+    query=$(readPlainText "$PROMPT_ENTER_QUERY")
+    query=$(querySanitizer "$query")
+
+    case "$1" in
+    "$SELECT_ENTIRE_ROW")
+        selectEntireRow "$query"
+        ;;
+    "$SELECT_CERTAIN_VALUES")
+        selectCertainValues "$query"
+        ;;
+    esac
+
+    displayResults "$PROMPT_QUERY_DONE" "$result"
+    set +x
+
+    pauseExecution
+    tableMenu
+}
+
+function querySanitizer() {
+    if integerValidator "$1"; then
+        echo "'$1'"
+    else
+        echo "$1"
+    fi
+}
+
+function selectEntireRow() {
+    result=$(grep -wis "${1}" "$tablePath")
+}
+
+function selectCertainValues() {
+    result=$(grep -wiso "'$1'" "$tablePath")
+}
+
+selectFromTable
