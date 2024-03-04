@@ -201,3 +201,32 @@ function checkNotEmptyData() {
 
     return 0
 }
+
+function queryMetaTable() {
+    echo -e "$PROMPT_EXISTING_COLS"
+    columns=$(
+        awk -F"$DATA_SEPARATOR" '
+            NR > 1 {
+                print NR-1 " - " $1
+            }
+        ' "$1"
+    )
+
+    # shellcheck disable=SC2034
+    numOfCols=$(echo "$columns" | wc -l)
+
+    printList "$columns"
+}
+
+function getColIndex() {
+    readValidNumeric "$PROMPT_SELECT_COL"
+    selectedCol=$(retrieveValidatedInput)
+
+    until [[ $selectedCol -le $1 ]]; do
+        printError "$PROMPT_COL_OUTBOUND_ERROR"
+        readValidNumeric "$PROMPT_SELECT_COL"
+        selectedCol=$(retrieveValidatedInput)
+    done
+
+    echo "$selectedCol"
+}

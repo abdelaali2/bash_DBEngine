@@ -65,38 +65,13 @@ function selectAll() {
 function selectEntireColumn() {
     queryMetaTable "$metaTablePath"
 
-    getColIndex "$numOfCols"
+    # shellcheck disable=SC2154
+    selectedCol=$(getColIndex "$numOfCols")
 
     queryDataTable "$selectedCol" "$tablePath"
 
     pauseExecution
     tableMenu
-}
-
-function queryMetaTable() {
-    echo -e "$PROMPT_EXISTING_COLS"
-    columns=$(
-        awk -F"$DATA_SEPARATOR" '
-            NR > 1 {
-                print NR-1 " - " $1
-            }
-        ' "$1"
-    )
-
-    numOfCols=$(echo "$columns" | wc -l)
-
-    printList "$columns"
-}
-
-function getColIndex() {
-    readValidNumeric "$PROMPT_SELECT_COL"
-    selectedCol=$(retrieveValidatedInput)
-
-    until [[ $selectedCol -le $1 ]]; do
-        printError "$PROMPT_COL_OUTBOUND_ERROR"
-        readValidNumeric "$PROMPT_SELECT_COL"
-        selectedCol=$(retrieveValidatedInput)
-    done
 }
 
 function queryDataTable() {
@@ -122,7 +97,6 @@ function displayResults() {
 }
 
 function selectRow() {
-    set -x
     local query
     query=$(readPlainText "$PROMPT_ENTER_QUERY")
     query=$(querySanitizer "$query")
@@ -137,7 +111,6 @@ function selectRow() {
     esac
 
     displayResults "$PROMPT_QUERY_DONE" "$result"
-    set +x
 
     pauseExecution
     tableMenu
@@ -152,11 +125,11 @@ function querySanitizer() {
 }
 
 function selectEntireRow() {
-    result=$(grep -wis "${1}" "$tablePath")
+    result=$(grep -wis "$1" "$tablePath")
 }
 
 function selectCertainValues() {
-    result=$(grep -wiso "'$1'" "$tablePath")
+    result=$(grep -wiso "$1" "$tablePath")
 }
 
 selectFromTable
