@@ -36,12 +36,18 @@ export SCRIPT_LIST_TABLES=".listTables.sh"
 export SCRITPT_DROP_TABLE=".dropTable.sh"
 export SCRIPT_INSERT_INTO_TABLE=".insertIntoTable.sh"
 export SCRIPT_SELECT_FROM_TABLE=".selectFromTable.sh"
+export SCRIPT_DELETE_FROM_TABLE=".deleteFromTable.sh"
 
 # Table Selection Menu Options
 export SELECT_ALL="Select all"
 export SELECT_ENTIRE_COLUMN="Select entire column"
 export SELECT_ENTIRE_ROW="Select entire row"
-export SELECT_CERTAIN_VALUES="Select certain value"
+export SELECT_CERTAIN_VALUES="Select certain values"
+
+# Table Deletion Menu Options
+export DELETE_TABLE="Delete table"
+export DELETE_ENTIRE_ROW="Delete row"
+export DELETE_CERTAIN_VALUES="Delete certain values"
 
 # General Select Options
 export EXIT="Exit"
@@ -98,6 +104,12 @@ export PROMPT_SELECT_COL="Select column number: "
 export PROMPT_COL_OUTBOUND_ERROR="Error: Index outbound!\n"
 export PROMPT_ENTER_QUERY="Enter your search query: "
 export PROMPT_QUERY_DONE="Query OK!\n"
+
+# Table Data Deletion Menu
+export PROMPT_DATA_DELETION_CONFIRM="All data will be deleted permanently! Continue? (Yes/No): "
+export PROMPT_DATA_DELETION_DONE="Data deleted successfully\n"
+export PROMPT_DATA_DELETION_ERROR="ERROR: Unable to delete data\n"
+export PROMPT_DATA_DELETION_CANCELLED="Data deletion cancelled"
 
 # Data Constants
 export DATA_SEPARATOR=":"
