@@ -66,8 +66,9 @@ function selectEntireColumn() {
     queryMetaTable "$metaTablePath"
 
     # shellcheck disable=SC2154
-    selectedCol=$(getColIndex "$numOfCols")
+    getColIndex "$numOfCols"
 
+    # shellcheck disable=SC2154
     queryDataTable "$selectedCol" "$tablePath"
 
     pauseExecution

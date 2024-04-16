@@ -202,6 +202,22 @@ function checkNotEmptyData() {
     return 0
 }
 
+function getColumnNameByIndex() {
+    local index=$1
+    local metadata=$2
+    ((index++))
+    awk -F "$DATA_SEPARATOR" -v row=$index '
+        NR==row {
+            print $1
+        }
+    ' "$2"
+}
+
+function checkIfPK() {
+    local columnName
+    columnName=$(getColumnNameByIndex "$@")
+}
+
 function queryMetaTable() {
     echo -e "$PROMPT_EXISTING_COLS"
     columns=$(
@@ -227,6 +243,12 @@ function getColIndex() {
         readValidNumeric "$PROMPT_SELECT_COL"
         selectedCol=$(retrieveValidatedInput)
     done
+}
 
-    echo "$selectedCol"
+function getColType() {
+    local index=$1
+    local metadata=$2
+
+    ((index++))
+    sed -n ${index}p "$metadata" | cut -d"$DATA_SEPARATOR" -f2
 }

@@ -27,111 +27,8 @@ function deleteFromTable() {
             deleteTableData
             ;;
         "$DELETE_ENTIRE_ROW")
-            typeset -i listofCol
-            typeset -i selectedCol
-            typeset -i delDone
-            echo -e "The existing Columns are: \n======================="
-            awk -F: '{if (NR>1) print NR-1,$1}' ./.${tableName}_metaData
-            listofCol=$( (awk -F: '{if (NR>1) print $0}' ./.${tableName}_metaData | wc -l))
-            echo "Enter the No. of the Column you want to Delete from: "
-            echo "Note: range from 1:99"
-            read -n 2 selectedCol
-            case ${selectedCol} in
-            +([1-9]|[1-9][0-9]))
-                if [[ $selectedCol -le $listofCol ]]; then
-                    ((selectedCol++))
-                    sed -n ${selectedCol}p ./.${tableName}_metaData | grep int >/dev/null
-                    let ifInt=$?
-                    ((selectedCol--))
-                    if [[ ifInt -eq 0 ]]; then
-                        echo -e "You choose an Integer type Column.\nPlease enter the No. you want to Delete"
-                        read requiredData
-                        case ${requiredData} in
-                        +([0-9]))
-                            index=$(awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | cut -d: -f1)
-                            indexlist=$(awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -wn $requiredData | wc -l)
-                            if [[ -z $index ]]; then
-                                echo "***Empty Set***"
-                            else
-                                let decrement=0
-                                echo "Value existing in "$indexlist" records."
-                                for ((i = 1; i <= $indexlist; i++)); do
-                                    line=$(echo $index | cut -d' ' -f$i)
-                                    if [[ $i -gt 1 ]]; then
-                                        for ((j = 1; j <= decrement; j++)); do
-                                            ((line--))
-                                        done
-                                    fi
-                                    echo $line
-                                    sed -in ${line}d ./${tableName}
-                                    delDone=$?
-                                    if [[ delDone -eq 0 ]]; then
-                                        echo "Row Deleted Successfully"
-                                        ((decrement++))
-                                    else
-                                        echo "Error: Delete Aborted!"
-                                    fi
-                                done
-                            fi
-                            ;;
-                        *)
-                            echo -e "Invalid Entry!\nReturning back to Delete Menu"
-                            sleep 3
-                            deleteTable
-                            ;;
-                        esac
-                    else
-                        sed -n ${selectedCol}p ./.${tableName}_metaData | grep string >/dev/null
-                        let ifString=$?
-                        if [[ ifString -eq 0 ]]; then
-                            echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
-                            read requiredData
-                            index=$(awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1)
-                            indexlist=$(awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l)
-                            if [ -z $index ]; then
-                                echo "***Empty Set***"
-                            else
-                                let decrement=0
-                                echo "Value existing in "$indexlist" records."
-                                for ((i = 1; i <= $indexlist; i++)); do
-                                    line=$(echo $index | cut -d' ' -f$i)
-                                    if [[ $i -gt 1 ]]; then
-                                        for ((j = 1; j <= decrement; j++)); do
-                                            ((line--))
-                                        done
-                                    fi
-                                    echo $line
-                                    sed -in ${line}d ./${tableName}
-                                    delDone=$?
-                                    if [[ delDone -eq 0 ]]; then
-                                        echo "Row Deleted Successfully"
-                                        ((decrement++))
-                                    else
-                                        echo "Error: Delete Aborted!"
-                                    fi
-                                done
-                            fi
-                        fi
-
-                    fi
-
-                    echo "Press Eneter to return back to Delete Menu"
-                    read cont
-                    deleteTable
-                else
-                    echo -e "Invalid Column No.!\nReturning back to Delete Menu"
-                    sleep 3
-                    deleteTable
-                fi
-                ;;
-            *)
-                echo -e "Invalid Column No.!\nReturning back to Delete Menu"
-                sleep 3
-                deleteTable
-                ;;
-            esac
+            deleteEntireRow
             ;;
-
         "$DELETE_CERTAIN_VALUES")
             typeset -i listofCol
             typeset -i selectedCol
@@ -252,6 +149,111 @@ function getTableSchema() {
     local schema
     schema=$(sed -n 1p "$tablePath")
     echo "$schema"
+}
+
+function deleteEntireRow() {
+    local colType=""
+    queryMetaTable "$metaTablePath"
+
+    # shellcheck disable=SC2154
+    getColIndex "$numOfCols"
+    colType=$(getColType "$selectedCol" "$metaTablePath")
+    # checkIfPK "$selectedCol" "$metaTablePath"
+    case "$colType" in
+    "$DATA_INTEGER")
+        deleteNumericData
+        ;;
+    "$DATA_STRING")
+        echo "item = 2 or item = 3"
+        ;;
+    esac
+
+    # this is the String scenario
+    #     sed -n ${selectedCol}p ./.${tableName}_metaData | grep string >/dev/null
+    #     let ifString=$?
+    #     if [[ ifString -eq 0 ]]; then
+    #         echo -e "You choose a String type Column.\nPlease enter the word you want to Delete"
+    #         read requiredData
+    #         index=$(awk -F: -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | cut -d: -f1)
+    #         indexlist=$(awk -F' ' -v grab=selectedCol '{print $grab}' ./${tableName} | grep -in $requiredData | wc -l)
+    #         if [ -z $index ]; then
+    #             echo "***Empty Set***"
+    #         else
+    #             let decrement=0
+    #             echo "Value existing in "$indexlist" records."
+    #             for ((i = 1; i <= $indexlist; i++)); do
+    #                 line=$(echo $index | cut -d' ' -f$i)
+    #                 if [[ $i -gt 1 ]]; then
+    #                     for ((j = 1; j <= decrement; j++)); do
+    #                         ((line--))
+    #                     done
+    #                 fi
+    #                 echo $line
+    #                 sed -in ${line}d ./${tableName}
+    #                 delDone=$?
+    #                 if [[ delDone -eq 0 ]]; then
+    #                     echo "Row Deleted Successfully"
+    #                     ((decrement++))
+    #                 else
+    #                     echo "Error: Delete Aborted!"
+    #                 fi
+    #             done
+    #         fi
+    #     fi
+
+    pauseExecution
+    tableMenu
+}
+
+function deleteNumericData() {
+    set -x
+    readValidNumeric "[$colType] - $PROMPT_ENTER_QUERY" "$data"
+    data=$(retrieveValidatedInput)
+    occurrances=$(grep -n "$data" "$tablePath" | cut -d: -f1)
+    if checkNotEmpty "$occurrances" "$PROMPT_EMPTY_SET"; then
+        counter=$(awk -v grab="$selectedCol" '{print $grab}' "$tablePath" | grep -cwn "$data")
+        printSuccess "$PROMPT_RECORDS_FOUND$counter"
+
+        if confirmChoice "[$counter] $PROMPT_DATA_OCCURRENCIES_DELETION_CONFIRM"; then
+            deleteRows "$tablePath" "$occurrances" "$counter"
+        else
+            printWarning "$PROMPT_DATA_DELETION_CANCELLED"
+
+        fi
+
+    fi
+    set +x
+}
+
+function deleteRows() {
+    local table=$1
+    local index=$2
+    # local numRows=$3
+
+    if sed -i'' "/${data}/d" "$table"; then
+        # ((decrement++))
+        printSuccess "$PROMPT_DATA_DELETION_DONE"
+    else
+        printError "$PROMPT_DATA_DELETION_ERROR"
+    fi
+
+    # ((decrement = 0))
+
+    # for ((i = 1; i <= numRows; i++)); do
+    #     line=$(sed -n "$i"p <<<"$index")
+    #     if ((i > 1)); then
+    #         for ((j = 1; j <= decrement; j++)); do
+    #             ((line--))
+    #         done
+    #     fi
+
+    #     if sed -in "${line}d" "$table" >>/dev/null; then
+    #         ((decrement++))
+    #         printSuccess "$PROMPT_DATA_DELETION_DONE"
+    #     else
+    #         printError "$PROMPT_DATA_DELETION_ERROR"
+    #     fi
+    # done
 }
 
 deleteFromTable

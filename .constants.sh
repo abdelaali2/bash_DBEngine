@@ -58,6 +58,7 @@ export PROMPT_INVALID_INPUT="Invalid input!"
 export PROMPT_INVALID_NAME="Invalid name! It must not start with a number or a special character\n"
 export PROPMPT_ENTER_TO_CONTINUE="Press 'Enter' to proceed"
 export PROMPT_EMPTY_SET="Empty set!\n"
+export PROMPT_RECORDS_FOUND="No. of found records: "
 
 # Main Menu Prompt Messages
 export PROMPT_READ_DB_NAME="Enter the database name: "
@@ -110,6 +111,7 @@ export PROMPT_DATA_DELETION_CONFIRM="All data will be deleted permanently! Conti
 export PROMPT_DATA_DELETION_DONE="Data deleted successfully\n"
 export PROMPT_DATA_DELETION_ERROR="ERROR: Unable to delete data\n"
 export PROMPT_DATA_DELETION_CANCELLED="Data deletion cancelled"
+export PROMPT_DATA_OCCURRENCIES_DELETION_CONFIRM="record(s) will be deleted permanently! Continue? (Yes/No): "
 
 # Data Constants
 export DATA_SEPARATOR=":"
